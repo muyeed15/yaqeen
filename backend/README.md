@@ -9,8 +9,9 @@ Islamic digital wallet API. Django REST + JWT + PostgreSQL.
 ## Setup
 
 ```bash
-conda create -n yaqeen python=3.12
-conda activate yaqeen
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 cp .env.example .env
 python manage.py migrate
@@ -22,7 +23,7 @@ The `.env` file and all required values are mandatory. The server address comes 
 
 ## Production
 
-The backend runs under PM2 via `gunicorn` inside the `yaqeen` conda environment. See the [project README](../README.md#production) for startup commands.
+The PM2 configuration runs `gunicorn` from `backend/.venv/bin/gunicorn` directly, so the virtual environment does not need to be activated before starting PM2. See the [project README](../README.md#production) for startup commands.
 
 ## Environment Variables
 
