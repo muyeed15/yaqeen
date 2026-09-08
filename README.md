@@ -18,8 +18,9 @@ Both services require their own `.env` file. Configuration has no code-level fal
 
 ```bash
 cd backend
-conda create -n yaqeen python=3.12
-conda activate yaqeen
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 cp .env.example .env
 # Update DB_PASSWORD and any local connection values.
@@ -84,6 +85,13 @@ npm run build
 Set production values in both required `.env` files. In particular, use a strong backend `SECRET_KEY`, set `DEBUG=False`, configure allowed hosts/origins, and use HTTPS values appropriate for the deployment.
 
 ```bash
+cd backend
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
+cd ..
 cd frontend
 npm ci
 npm run build
