@@ -223,5 +223,8 @@ __marimo__/
 # Django media uploads
 backend/media/
 
+# macOS Finder metadata
+.DS_Store
+
 # Report
 /report
