@@ -222,3 +222,6 @@ __marimo__/
 
 # Django media uploads
 backend/media/
+
+# Report
+/report
