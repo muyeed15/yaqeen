@@ -1,3 +1,3 @@
-import { proxyList } from '@/app/api/_proxy'
+import { proxyList } from "@/app/api/_proxy";
 
-export const GET = proxyList('/api/operators/')
+export const GET = proxyList("/api/operators/");

@@ -1,9 +1,5 @@
 import { ReactNode } from "react";
 
-export function PageTransition({
-  children,
-}: {
-  children: ReactNode;
-}): React.ReactElement {
+export function PageTransition({ children }: { children: ReactNode }): React.ReactElement {
   return <>{children}</>;
 }

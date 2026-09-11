@@ -18,11 +18,5 @@ export function PaginationUrl({ page, totalPages }: Props) {
     router.push(`?${params.toString()}`);
   };
 
-  return (
-    <Pagination
-      page={page}
-      totalPages={totalPages}
-      onPageChange={handlePageChange}
-    />
-  );
+  return <Pagination page={page} totalPages={totalPages} onPageChange={handlePageChange} />;
 }

@@ -28,17 +28,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             "hover:border-navy-muted/40",
             "focus:border-teal focus:ring-2 focus:ring-teal/10",
             "disabled:bg-sage disabled:text-navy-muted disabled:cursor-not-allowed",
-            error
-              ? "border-red-400 focus:border-red-500 focus:ring-red-500/10"
-              : "border-sage-mid",
+            error ? "border-red-400 focus:border-red-500 focus:ring-red-500/10" : "border-sage-mid",
             className,
           )}
           {...props}
         />
         {error && <p className="text-xs text-red-500 mt-0.5">{error}</p>}
-        {hint && !error && (
-          <p className="text-xs text-navy-muted mt-0.5">{hint}</p>
-        )}
+        {hint && !error && <p className="text-xs text-navy-muted mt-0.5">{hint}</p>}
       </div>
     );
   },

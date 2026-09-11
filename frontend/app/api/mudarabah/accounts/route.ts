@@ -1,2 +1,2 @@
-import { proxyList } from '../../_proxy';
-export const GET = proxyList('/api/mudarabah/accounts/');
+import { proxyList } from "../../_proxy";
+export const GET = proxyList("/api/mudarabah/accounts/");

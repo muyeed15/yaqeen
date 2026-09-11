@@ -6,19 +6,34 @@ import { usePathname } from "next/navigation";
 import { ReactNode, useState, useEffect, useCallback, useRef } from "react";
 
 import {
-  Home, Receipt, Bell, User,
-  CreditCard, ShoppingCart, Landmark, Heart, LayoutGrid, QrCode,
-  Smartphone, Zap, Building2, Send, Ticket, Gift, Globe2, FileText, HandCoins,
-  Vault, ShieldCheck, MessageCircle,
+  Home,
+  Receipt,
+  Bell,
+  User,
+  CreditCard,
+  ShoppingCart,
+  Landmark,
+  Heart,
+  LayoutGrid,
+  QrCode,
+  Smartphone,
+  Zap,
+  Building2,
+  Send,
+  Ticket,
+  Gift,
+  Globe2,
+  FileText,
+  HandCoins,
+  Vault,
+  ShieldCheck,
+  MessageCircle,
 } from "lucide-react";
 import useSWR from "swr";
 import { TOAST_DURATION_MS } from "@/utils/swr";
 import { useSSE } from "@/hooks/useSSE";
 import { ToastStack, type Toast } from "@/components/ui/Toast";
-import type {
-  Notification,
-  PaginatedResponse,
-} from "@/types";
+import type { Notification, PaginatedResponse } from "@/types";
 
 const NAV = [
   { href: "/dashboard", icon: Home, label: "Home" },
@@ -70,9 +85,7 @@ export function AppShell({
   const seenIds = useRef(new Set<number>());
   const notifInitialized = useRef(false);
 
-  const { data: notifPage } = useSWR<PaginatedResponse<Notification>>(
-    "/api/notifications?page=1",
-  );
+  const { data: notifPage } = useSWR<PaginatedResponse<Notification>>("/api/notifications?page=1");
 
   const unreadCount = notifPage
     ? notifPage.results.filter((n) => !n.is_read).length
@@ -115,99 +128,99 @@ export function AppShell({
 
   return (
     <>
-    <ToastStack toasts={toasts} onDismiss={dismissToast} />
-    <div className="h-dvh flex flex-col overflow-hidden">
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-56 shrink-0 bg-white border-r border-sage/80 fixed top-0 left-0 h-dvh z-20">
-        <div className="px-5 h-16 flex items-center gap-2.5 border-b border-sage/80">
-          <Image src="/logo.svg" alt="Yaqeen" width={32} height={32} className="shrink-0" />
-          <span className="text-navy font-bold text-base tracking-tight">
-            Yaqeen
-          </span>
-        </div>
+      <ToastStack toasts={toasts} onDismiss={dismissToast} />
+      <div className="h-dvh flex flex-col overflow-hidden">
+        {/* Desktop sidebar */}
+        <aside className="hidden lg:flex flex-col w-56 shrink-0 bg-white border-r border-sage/80 fixed top-0 left-0 h-dvh z-20">
+          <div className="px-5 h-16 flex items-center gap-2.5 border-b border-sage/80">
+            <Image src="/logo.svg" alt="Yaqeen" width={32} height={32} className="shrink-0" />
+            <span className="text-navy font-bold text-base tracking-tight">Yaqeen</span>
+          </div>
 
-        <nav className="flex-1 py-3 overflow-y-auto" aria-label="Main navigation">
-          {NAV.map((item) => {
-            const { href, label } = item;
-            const Icon = item.icon;
-            const active = path === href || path.startsWith(href);
-            return (
-              <Link
-                key={href}
-                href={href}
-                aria-current={active ? "page" : undefined}
-                className={`flex items-center gap-3 mx-2 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-150 ${
-                  active
-                    ? "bg-teal/10 text-teal"
-                    : "text-navy-muted hover:bg-sage/50 hover:text-navy"
-                }`}
-              >
-                <div className="relative">
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                  {href === "/notifications" && unreadCount > 0 && (
-                    <span
-                      className="absolute -top-1.5 -right-1.5 h-3.5 w-3.5 bg-teal text-white text-[8px] font-bold flex items-center justify-center rounded-full ring-2 ring-white"
-                      aria-label={`${unreadCount} unread notifications`}
-                    >
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </span>
-                  )}
-                </div>
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
-      </aside>
-
-      {/* Content area */}
-      <div className="flex-1 lg:ml-56 overflow-y-auto bg-sage/30">
-        <main>{children}</main>
-      </div>
-
-      {/* Mobile bottom nav */}
-      <nav
-        className="lg:hidden shrink-0 z-20 bg-white border-t border-sage-mid/60 safe-bottom"
-        aria-label="Mobile navigation"
-      >
-        <div className="flex">
-          {MOBILE_NAV.map((item) => {
-            const { href, label } = item;
-            const Icon = item.icon;
-            const active = path === href || path.startsWith(href + "/");
-            return (
-              <Link
-                key={href}
-                href={href}
-                aria-current={active ? "page" : undefined}
-                className={`flex-1 flex flex-col items-center gap-0.5 pt-2 pb-3 transition-colors duration-150`}
-              >
-                <div className={`relative p-1.5 rounded-xl transition-colors duration-150 ${
-                  active ? "bg-teal/10" : ""
-                }`}>
-                  <Icon
-                    className={`h-5 w-5 ${active ? "text-teal" : "text-navy-muted"}`}
-                    aria-hidden="true"
-                  />
-                  {href === "/notifications" && unreadCount > 0 && (
-                    <span
-                      className="absolute -top-0.5 -right-0.5 h-3 w-3 bg-teal text-white text-[7px] font-bold flex items-center justify-center rounded-full ring-2 ring-white"
-                      aria-label={`${unreadCount} unread`}
-                    >
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </span>
-                  )}
-                </div>
-                <span
-                  className={`text-[10px] font-semibold ${active ? "text-teal" : "text-navy-muted"}`}
+          <nav className="flex-1 py-3 overflow-y-auto" aria-label="Main navigation">
+            {NAV.map((item) => {
+              const { href, label } = item;
+              const Icon = item.icon;
+              const active = path === href || path.startsWith(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  aria-current={active ? "page" : undefined}
+                  className={`flex items-center gap-3 mx-2 px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-150 ${
+                    active
+                      ? "bg-teal/10 text-teal"
+                      : "text-navy-muted hover:bg-sage/50 hover:text-navy"
+                  }`}
                 >
+                  <div className="relative">
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                    {href === "/notifications" && unreadCount > 0 && (
+                      <span
+                        className="absolute -top-1.5 -right-1.5 h-3.5 w-3.5 bg-teal text-white text-[8px] font-bold flex items-center justify-center rounded-full ring-2 ring-white"
+                        aria-label={`${unreadCount} unread notifications`}
+                      >
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
+                  </div>
                   {label}
-                </span>
-              </Link>
-            );
-          })}
+                </Link>
+              );
+            })}
+          </nav>
+        </aside>
+
+        {/* Content area */}
+        <div className="flex-1 lg:ml-56 overflow-y-auto bg-sage/30">
+          <main>{children}</main>
         </div>
-      </nav>
+
+        {/* Mobile bottom nav */}
+        <nav
+          className="lg:hidden shrink-0 z-20 bg-white border-t border-sage-mid/60 safe-bottom"
+          aria-label="Mobile navigation"
+        >
+          <div className="flex">
+            {MOBILE_NAV.map((item) => {
+              const { href, label } = item;
+              const Icon = item.icon;
+              const active = path === href || path.startsWith(href + "/");
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  aria-current={active ? "page" : undefined}
+                  className={`flex-1 flex flex-col items-center gap-0.5 pt-2 pb-3 transition-colors duration-150`}
+                >
+                  <div
+                    className={`relative p-1.5 rounded-xl transition-colors duration-150 ${
+                      active ? "bg-teal/10" : ""
+                    }`}
+                  >
+                    <Icon
+                      className={`h-5 w-5 ${active ? "text-teal" : "text-navy-muted"}`}
+                      aria-hidden="true"
+                    />
+                    {href === "/notifications" && unreadCount > 0 && (
+                      <span
+                        className="absolute -top-0.5 -right-0.5 h-3 w-3 bg-teal text-white text-[7px] font-bold flex items-center justify-center rounded-full ring-2 ring-white"
+                        aria-label={`${unreadCount} unread`}
+                      >
+                        {unreadCount > 9 ? "9+" : unreadCount}
+                      </span>
+                    )}
+                  </div>
+                  <span
+                    className={`text-[10px] font-semibold ${active ? "text-teal" : "text-navy-muted"}`}
+                  >
+                    {label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
       </div>
     </>
   );

@@ -1,38 +1,32 @@
-"use client"
+"use client";
 
-import { useCallback, useState } from "react"
-import { toggleSadaqahJariyahAction } from "@/app/actions"
-import { Button } from "@/components/ui/Button"
+import { useCallback, useState } from "react";
+import { toggleSadaqahJariyahAction } from "@/app/actions";
+import { Button } from "@/components/ui/Button";
 
 export function ToggleDonationButton({
   donationId,
   isActive,
 }: {
-  donationId: number
-  isActive: boolean
+  donationId: number;
+  isActive: boolean;
 }) {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const handleToggle = useCallback(async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      await toggleSadaqahJariyahAction(donationId, !isActive)
+      await toggleSadaqahJariyahAction(donationId, !isActive);
     } catch {
       // handled in action
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [donationId, isActive])
+  }, [donationId, isActive]);
 
   return (
-    <Button
-      type="button"
-      variant="secondary"
-      loading={loading}
-      onClick={handleToggle}
-      size="sm"
-    >
+    <Button type="button" variant="secondary" loading={loading} onClick={handleToggle} size="sm">
       {isActive ? "Pause" : "Resume"}
     </Button>
-  )
+  );
 }

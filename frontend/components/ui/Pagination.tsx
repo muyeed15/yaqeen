@@ -49,9 +49,7 @@ export function Pagination({ page, totalPages, onPageChange }: Props) {
             type="button"
             onClick={() => onPageChange(p)}
             className={`w-8 h-8 text-xs font-semibold border transition-colors rounded-lg ${
-              p === page
-                ? "bg-teal text-white border-teal"
-                : "bg-white border-sage-mid text-navy"
+              p === page ? "bg-teal text-white border-teal" : "bg-white border-sage-mid text-navy"
             }`}
           >
             {p}

@@ -51,7 +51,7 @@ function generateBooked(
 ) {
   const rand = seededRandom((hashString(coach) ^ baseSeed) >>> 0);
   const booked = new Set<string>();
-  const toBook = Math.floor((cols * rows) * 0.3);
+  const toBook = Math.floor(cols * rows * 0.3);
   while (booked.size < toBook) {
     const r = Math.floor(rand() * rows);
     const c = Math.floor(rand() * cols);
@@ -60,12 +60,7 @@ function generateBooked(
   return booked;
 }
 
-export default function SeatPicker({
-  category,
-  maxSelect = 9,
-  coaches = [],
-  onSelect,
-}: Props) {
+export default function SeatPicker({ category, maxSelect = 9, coaches = [], onSelect }: Props) {
   const layout = LAYOUTS[category] ?? LAYOUTS.bus;
   const hasCoaches = coaches.length > 0;
   const [seed] = useState(() => Math.floor(Math.random() * 2 ** 32));
@@ -73,8 +68,7 @@ export default function SeatPicker({
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const booked = useMemo(
-    () =>
-      generateBooked(layout.cols, layout.rows, layout.labels, selectedCoach, seed),
+    () => generateBooked(layout.cols, layout.rows, layout.labels, selectedCoach, seed),
     [layout, selectedCoach, seed],
   );
 
@@ -98,9 +92,7 @@ export default function SeatPicker({
   const totalCols = layout.cols + 1 + (layout.aisleAfter ? 1 : 0);
   const selectedList = Array.from(selected);
   const atMax = selectedList.length >= maxSelect;
-  const selectedCoaches = hasCoaches
-    ? [...new Set(selectedList.map((s) => s.split(" ")[0]))]
-    : [];
+  const selectedCoaches = hasCoaches ? [...new Set(selectedList.map((s) => s.split(" ")[0]))] : [];
 
   function seatId(row: number, col: number) {
     return hasCoaches
@@ -140,16 +132,12 @@ export default function SeatPicker({
           }`}
         >
           <Users className="h-3.5 w-3.5" />
-          {selectedList.length > 0
-            ? `${selectedList.length} selected`
-            : "Tap seats to select"}
+          {selectedList.length > 0 ? `${selectedList.length} selected` : "Tap seats to select"}
         </span>
       </div>
 
       {atMax && (
-        <p className="text-[10px] text-amber-600">
-          Maximum {maxSelect} seats per booking.
-        </p>
+        <p className="text-[10px] text-amber-600">Maximum {maxSelect} seats per booking.</p>
       )}
 
       {hasCoaches && (
@@ -198,20 +186,13 @@ export default function SeatPicker({
           {Array.from({ length: layout.rows }).map((_, ri) => {
             const rowNum = ri + 1;
             const cells: React.ReactNode[] = [
-              <div
-                key={`rn-${rowNum}`}
-                className="aspect-square flex items-center justify-center"
-              >
-                <span className="text-[9px] font-semibold text-navy-muted">
-                  {rowNum}
-                </span>
+              <div key={`rn-${rowNum}`} className="aspect-square flex items-center justify-center">
+                <span className="text-[9px] font-semibold text-navy-muted">{rowNum}</span>
               </div>,
             ];
             for (let ci = 0; ci < layout.cols; ci++) {
               if (layout.aisleAfter === ci) {
-                cells.push(
-                  <div key={`aisle-${rowNum}-${ci}`} className="aspect-square" />,
-                );
+                cells.push(<div key={`aisle-${rowNum}-${ci}`} className="aspect-square" />);
               }
               const id = seatId(rowNum, ci);
               const seat = seats.find((s) => s.row === rowNum && s.col === ci);
@@ -231,16 +212,8 @@ export default function SeatPicker({
                         : `${id} - Available`
                   }
                   className={`aspect-square w-full rounded-md flex items-center justify-center text-[8px] sm:text-[9px] font-bold transition-all duration-100
-                    ${
-                      isBooked
-                        ? "bg-sage-mid/40 text-sage-mid cursor-not-allowed"
-                        : ""
-                    }
-                    ${
-                      isSelected
-                        ? "bg-teal text-white ring-2 ring-teal/30 scale-105"
-                        : ""
-                    }
+                    ${isBooked ? "bg-sage-mid/40 text-sage-mid cursor-not-allowed" : ""}
+                    ${isSelected ? "bg-teal text-white ring-2 ring-teal/30 scale-105" : ""}
                     ${
                       !isBooked && !isSelected
                         ? "bg-white border border-sage-mid hover:border-teal hover:bg-teal/5 text-navy-muted cursor-pointer"
@@ -248,11 +221,7 @@ export default function SeatPicker({
                     }
                   `}
                 >
-                  {isSelected ? (
-                    <Check className="h-3 w-3" />
-                  ) : (
-                    shortLabel(rowNum, ci)
-                  )}
+                  {isSelected ? <Check className="h-3 w-3" /> : shortLabel(rowNum, ci)}
                 </button>,
               );
             }
@@ -283,9 +252,7 @@ export default function SeatPicker({
 
       {selectedList.length > 0 && (
         <div className="bg-white border border-teal rounded-xl px-4 py-2.5 flex items-center justify-between gap-2">
-          <span className="text-sm font-bold text-navy truncate">
-            {selectedList.join(", ")}
-          </span>
+          <span className="text-sm font-bold text-navy truncate">{selectedList.join(", ")}</span>
           <span className="text-[10px] font-semibold uppercase tracking-widest text-teal shrink-0">
             {selectedList.length} {selectedList.length === 1 ? "seat" : "seats"}
           </span>
@@ -294,11 +261,7 @@ export default function SeatPicker({
 
       <input type="hidden" name="seat_number" value={selectedList.join(", ")} />
       {hasCoaches && (
-        <input
-          type="hidden"
-          name="coach"
-          value={selectedCoaches.join(", ") || selectedCoach}
-        />
+        <input type="hidden" name="coach" value={selectedCoaches.join(", ") || selectedCoach} />
       )}
     </div>
   );

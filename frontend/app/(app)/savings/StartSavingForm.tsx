@@ -1,21 +1,16 @@
-"use client"
+"use client";
 
-import { useActionState } from "react"
-import { createMudarabahAccountAction } from "@/app/actions"
-import { Button } from "@/components/ui/Button"
+import { useActionState } from "react";
+import { createMudarabahAccountAction } from "@/app/actions";
+import { Button } from "@/components/ui/Button";
 
 export function StartSavingForm({ planId }: { planId: number }) {
-  const [state, action, pending] = useActionState(
-    createMudarabahAccountAction,
-    null,
-  )
+  const [state, action, pending] = useActionState(createMudarabahAccountAction, null);
 
   return (
     <form action={action}>
       <input type="hidden" name="plan_id" value={planId} />
-      {state?.error && (
-        <p className="text-xs text-red-600 mb-2">{state.error}</p>
-      )}
+      {state?.error && <p className="text-xs text-red-600 mb-2">{state.error}</p>}
       <Button
         type="submit"
         loading={pending}
@@ -24,5 +19,5 @@ export function StartSavingForm({ planId }: { planId: number }) {
         {pending ? "Starting..." : "Start Saving"}
       </Button>
     </form>
-  )
+  );
 }

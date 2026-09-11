@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useActionState } from "react"
-import { updateHawlAction } from "@/app/actions"
-import { Input } from "@/components/ui/Input"
-import { Button } from "@/components/ui/Button"
+import { useActionState } from "react";
+import { updateHawlAction } from "@/app/actions";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
 
 export function UpdateHawlForm() {
-  const [state, action, pending] = useActionState(updateHawlAction, null)
+  const [state, action, pending] = useActionState(updateHawlAction, null);
 
   return (
     <div className="bg-white border border-sage-mid p-5 rounded-xl">
@@ -17,7 +17,9 @@ export function UpdateHawlForm() {
         </div>
       )}
       {state?.error && (
-        <div className="mb-4 border-l-4 border-red-500 bg-red-50 px-4 py-3 text-sm text-red-700">{state.error}</div>
+        <div className="mb-4 border-l-4 border-red-500 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {state.error}
+        </div>
       )}
       <form action={action} className="space-y-4">
         <Input
@@ -33,5 +35,5 @@ export function UpdateHawlForm() {
         </Button>
       </form>
     </div>
-  )
+  );
 }

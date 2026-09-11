@@ -31,12 +31,7 @@ type Props = {
   onSelect: (isoDate: string) => void;
 };
 
-export function DateChips({
-  label = "Select Date",
-  days = 7,
-  defaultOffset = 3,
-  onSelect,
-}: Props) {
+export function DateChips({ label = "Select Date", days = 7, defaultOffset = 3, onSelect }: Props) {
   const dates = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -73,9 +68,7 @@ export function DateChips({
                 : "bg-white border-sage-mid text-navy hover:border-teal"
             }`}
           >
-            <span className="text-[9px] font-semibold uppercase tracking-wide">
-              {d.weekday}
-            </span>
+            <span className="text-[9px] font-semibold uppercase tracking-wide">{d.weekday}</span>
             <span className="text-base font-bold leading-tight">{d.day}</span>
             <span className="text-[10px]">{d.month}</span>
           </button>

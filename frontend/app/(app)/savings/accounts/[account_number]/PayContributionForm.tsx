@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import { useActionState } from "react"
-import { payContributionAction } from "@/app/actions"
-import { Button } from "@/components/ui/Button"
+import { useActionState } from "react";
+import { payContributionAction } from "@/app/actions";
+import { Button } from "@/components/ui/Button";
 
 export function PayContributionForm({
   accountNumber,
   monthlyAmount,
 }: {
-  accountNumber: string
-  monthlyAmount: string
+  accountNumber: string;
+  monthlyAmount: string;
 }) {
-  const [state, action, pending] = useActionState(payContributionAction, null)
+  const [state, action, pending] = useActionState(payContributionAction, null);
 
   return (
     <form action={action} className="bg-white border border-sage-mid p-4 mb-4 rounded-xl">
@@ -37,5 +37,5 @@ export function PayContributionForm({
         </Button>
       </div>
     </form>
-  )
+  );
 }

@@ -15,7 +15,10 @@ export function ToastStack({
   const [parent] = useAutoAnimate();
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 w-80 max-w-[calc(100vw-2rem)]" ref={parent}>
+    <div
+      className="fixed top-4 right-4 z-50 flex flex-col gap-2 w-80 max-w-[calc(100vw-2rem)]"
+      ref={parent}
+    >
       {toasts.map((t) => (
         <div
           key={t.id}

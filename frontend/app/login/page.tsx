@@ -1,13 +1,13 @@
-import { readFileSync } from "fs"
-import { join } from "path"
-import { LoginForm } from "./LoginForm"
+import { readFileSync } from "fs";
+import { join } from "path";
+import { LoginForm } from "./LoginForm";
 
 export default function LoginPage() {
-  const svgPath = join(process.cwd(), "assets", "yaqeen-balance-background.svg")
-  let svgDataUri = ""
+  const svgPath = join(process.cwd(), "assets", "yaqeen-balance-background.svg");
+  let svgDataUri = "";
   try {
-    const svg = readFileSync(svgPath, "utf-8")
-    svgDataUri = `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`
+    const svg = readFileSync(svgPath, "utf-8");
+    svgDataUri = `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
   } catch {}
 
   return (

@@ -21,16 +21,9 @@ export function SuccessModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-navy/60">
       <div className="bg-white w-full max-w-sm overflow-hidden rounded-xl">
         <div className="bg-teal px-6 py-8 text-center">
-          <CheckCircle
-            className="h-14 w-14 text-white mx-auto mb-3"
-            strokeWidth={1.5}
-          />
-          <p className="text-white/70 text-xs font-semibold uppercase tracking-widest">
-            {label}
-          </p>
-          <p className="text-white text-4xl font-bold tabular-nums mt-2">
-            {formatAmount(amount)}
-          </p>
+          <CheckCircle className="h-14 w-14 text-white mx-auto mb-3" strokeWidth={1.5} />
+          <p className="text-white/70 text-xs font-semibold uppercase tracking-widest">{label}</p>
+          <p className="text-white text-4xl font-bold tabular-nums mt-2">{formatAmount(amount)}</p>
         </div>
 
         <div className="divide-y divide-sage-mid">
@@ -44,9 +37,7 @@ export function SuccessModal({
             <span className="text-xs font-semibold uppercase tracking-widest text-navy-muted w-28 shrink-0 mt-0.5">
               Status
             </span>
-            <span className="text-sm font-semibold text-teal">
-              Completed
-            </span>
+            <span className="text-sm font-semibold text-teal">Completed</span>
           </div>
         </div>
 
