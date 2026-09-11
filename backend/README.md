@@ -256,6 +256,23 @@ All endpoints require `Authorization: Bearer <token>` except JWT login/refresh a
 | GET        | `/api/statements/`             | Account statements |
 | POST       | `/api/statements/generate/`    | Generate statement |
 
+## Formatting
+
+The backend is formatted with [Black](https://black.readthedocs.io/) (line length 100) and imports are ordered with [isort](https://pycqa.github.io/isort/) using the Black profile. Install the dev tools and run them:
+
+```bash
+pip install -r requirements-dev.txt
+isort .
+black .
+```
+
+Check formatting without writing changes:
+
+```bash
+isort --check-only .
+black --check .
+```
+
 ## Useful Commands
 
 ```bash
