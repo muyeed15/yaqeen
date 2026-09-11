@@ -19,14 +19,9 @@ export default function PayBillPage() {
     category: string;
   }>();
   const router = useRouter();
-  const [state, formAction, pending] = useActionState(
-    payBillAction,
-    initialState,
-  );
+  const [state, formAction, pending] = useActionState(payBillAction, initialState);
 
-  const { data } = useSWR<Biller[]>(
-    `/api/billers?category=${encodeURIComponent(category)}`,
-  );
+  const { data } = useSWR<Biller[]>(`/api/billers?category=${encodeURIComponent(category)}`);
   const biller = (data ?? []).find((b) => b.id === Number(billerId)) ?? null;
 
   return (
@@ -34,7 +29,7 @@ export default function PayBillPage() {
       <div className="bg-white px-4 h-16 flex items-center gap-3 border-b border-sage/80">
         <button
           type="button"
-          onClick={() => router.back()}
+          onClick={() => router.push(`/billpay/${category}`)}
           aria-label="Go back"
           className="text-navy-muted hover:text-navy active:scale-90 transition-all duration-150"
         >
@@ -103,12 +98,7 @@ export default function PayBillPage() {
             placeholder="500"
             required
           />
-          <Input
-            name="bill_month"
-            label="Bill Month"
-            type="text"
-            placeholder="e.g. 01/2026"
-          />
+          <Input name="bill_month" label="Bill Month" type="month" />
 
           {state.message && !state.ok && (
             <div className="border-l-4 border-red-500 bg-red-50 px-4 py-3 text-sm text-red-700 rounded-r">
