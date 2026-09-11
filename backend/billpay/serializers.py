@@ -11,8 +11,15 @@ class BillerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Biller
         fields = [
-            "id", "name", "category", "category_label", "biller_code", "logo",
-            "account_no_label", "amount_no_label", "is_active",
+            "id",
+            "name",
+            "category",
+            "category_label",
+            "biller_code",
+            "logo",
+            "account_no_label",
+            "amount_no_label",
+            "is_active",
         ]
 
     def get_logo(self, obj):
@@ -47,8 +54,17 @@ class BillPaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = BillPayment
         fields = [
-            "id", "biller", "biller_name", "biller_category",
-            "account_number", "bill_number", "amount", "fee",
-            "bill_month", "reference", "status", "created_at",
+            "id",
+            "biller",
+            "biller_name",
+            "biller_category",
+            "account_number",
+            "bill_number",
+            "amount",
+            "fee",
+            "bill_month",
+            "reference",
+            "status",
+            "created_at",
         ]
         read_only_fields = ["reference", "status", "created_at"]

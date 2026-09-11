@@ -42,14 +42,17 @@ class TransactionModelTest(TestCase):
 
     def test_transaction_with_note(self):
         tx = Transaction.objects.create(
-            sender=self.sender, amount=Decimal("25.00"),
-            transaction_type="send", note="Test note here",
+            sender=self.sender,
+            amount=Decimal("25.00"),
+            transaction_type="send",
+            note="Test note here",
         )
         self.assertEqual(tx.note, "Test note here")
 
     def test_transaction_null_sender(self):
         tx = Transaction.objects.create(
-            receiver=self.receiver, amount=Decimal("50.00"),
+            receiver=self.receiver,
+            amount=Decimal("50.00"),
             transaction_type="cash_in",
         )
         self.assertIsNone(tx.sender)
@@ -57,7 +60,8 @@ class TransactionModelTest(TestCase):
     def test_transaction_all_types(self):
         for ttype, _ in Transaction.TYPE_CHOICES:
             tx = Transaction.objects.create(
-                sender=self.sender, amount=Decimal("10.00"),
+                sender=self.sender,
+                amount=Decimal("10.00"),
                 transaction_type=ttype,
             )
             self.assertEqual(tx.transaction_type, ttype)
@@ -65,14 +69,17 @@ class TransactionModelTest(TestCase):
     def test_transaction_all_statuses(self):
         for status_val, _ in Transaction.STATUS_CHOICES:
             tx = Transaction.objects.create(
-                sender=self.sender, amount=Decimal("10.00"),
-                transaction_type="send", status=status_val,
+                sender=self.sender,
+                amount=Decimal("10.00"),
+                transaction_type="send",
+                status=status_val,
             )
             self.assertEqual(tx.status, status_val)
 
     def test_default_fee_is_zero(self):
         tx = Transaction.objects.create(
-            sender=self.sender, amount=Decimal("100.00"),
+            sender=self.sender,
+            amount=Decimal("100.00"),
             transaction_type="send",
         )
         self.assertEqual(tx.fee, Decimal("0.00"))

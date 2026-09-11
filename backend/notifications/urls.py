@@ -13,9 +13,7 @@ urlpatterns = [
         NotificationStreamView.as_view(),
         name="notification-stream",
     ),
-    path(
-        "notifications/", NotificationListView.as_view(), name="notification-list"
-    ),
+    path("notifications/", NotificationListView.as_view(), name="notification-list"),
     path(
         "notifications/read-all/",
         NotificationMarkAllReadView.as_view(),

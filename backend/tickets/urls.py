@@ -1,8 +1,12 @@
 from django.urls import path
 
 from tickets.views import (
-    TicketCategoryListView, TicketProviderListView, TicketTripsView,
-    BookTicketView, TicketHistoryView, CancelTicketView,
+    BookTicketView,
+    CancelTicketView,
+    TicketCategoryListView,
+    TicketHistoryView,
+    TicketProviderListView,
+    TicketTripsView,
 )
 
 urlpatterns = [

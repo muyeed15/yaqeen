@@ -16,8 +16,11 @@ class TransactionListViewTest(TestCase):
         self.receiver = make_user("01700000002", "2222222222")
         self.client.force_authenticate(user=self.sender)
         Transaction.objects.create(
-            sender=self.sender, receiver=self.receiver,
-            amount=Decimal("50.00"), transaction_type="send", status="completed",
+            sender=self.sender,
+            receiver=self.receiver,
+            amount=Decimal("50.00"),
+            transaction_type="send",
+            status="completed",
         )
 
     def test_list_transactions(self):
@@ -56,8 +59,11 @@ class TransactionDetailViewTest(TestCase):
         self.sender = make_user("01700000001", "1111111111")
         self.receiver = make_user("01700000002", "2222222222")
         self.tx = Transaction.objects.create(
-            sender=self.sender, receiver=self.receiver,
-            amount=Decimal("75.00"), transaction_type="send", status="completed",
+            sender=self.sender,
+            receiver=self.receiver,
+            amount=Decimal("75.00"),
+            transaction_type="send",
+            status="completed",
         )
         self.client.force_authenticate(user=self.sender)
 
@@ -94,9 +100,11 @@ class TransactionPaginationTest(TestCase):
         receiver = make_user("01700000002", "2222222222")
         for i in range(15):
             Transaction.objects.create(
-                sender=self.user, receiver=receiver,
+                sender=self.user,
+                receiver=receiver,
                 amount=Decimal(f"{i+1}0.00"),
-                transaction_type="send", status="completed",
+                transaction_type="send",
+                status="completed",
             )
         self.client.force_authenticate(user=self.user)
 

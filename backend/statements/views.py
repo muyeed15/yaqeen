@@ -9,11 +9,10 @@ from rest_framework.views import APIView
 
 from common.pagination import get_page, get_page_size, paginate
 from common.utils import error_response
-
 from transactions.models import Transaction
 
 from .models import AccountStatement
-from .serializers import StatementSerializer, GenerateStatementSerializer
+from .serializers import GenerateStatementSerializer, StatementSerializer
 
 logger = logging.getLogger("statements")
 
@@ -24,12 +23,14 @@ class StatementListView(APIView):
     def get(self, request):
         qs = AccountStatement.objects.filter(user=request.user).order_by("-year", "-month")
         p = paginate(qs, get_page(request), get_page_size(request))
-        return Response({
-            "count": p["count"],
-            "total_pages": p["total_pages"],
-            "page": p["page"],
-            "results": StatementSerializer(p["queryset"], many=True).data,
-        })
+        return Response(
+            {
+                "count": p["count"],
+                "total_pages": p["total_pages"],
+                "page": p["page"],
+                "results": StatementSerializer(p["queryset"], many=True).data,
+            }
+        )
 
 
 class GenerateStatementView(APIView):

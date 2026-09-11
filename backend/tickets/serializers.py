@@ -1,15 +1,23 @@
 from rest_framework import serializers
 
-from .models import TicketProvider, TicketBooking, TicketTrip
+from .models import TicketBooking, TicketProvider, TicketTrip
 
 
 class TicketTripSerializer(serializers.ModelSerializer):
     class Meta:
         model = TicketTrip
         fields = [
-            "id", "provider", "name", "origin", "destination",
-            "departure_time", "arrival_time", "coach_class", "coaches",
-            "price", "is_active",
+            "id",
+            "provider",
+            "name",
+            "origin",
+            "destination",
+            "departure_time",
+            "arrival_time",
+            "coach_class",
+            "coaches",
+            "price",
+            "is_active",
         ]
 
 
@@ -42,11 +50,24 @@ class TicketBookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = TicketBooking
         fields = [
-            "id", "booking_reference", "provider", "provider_name",
-            "provider_category", "journey_date", "departure_time",
-            "origin", "destination", "trip_name", "coach_class",
-            "coach", "seat_number", "passengers", "amount", "fee",
-            "status", "created_at",
+            "id",
+            "booking_reference",
+            "provider",
+            "provider_name",
+            "provider_category",
+            "journey_date",
+            "departure_time",
+            "origin",
+            "destination",
+            "trip_name",
+            "coach_class",
+            "coach",
+            "seat_number",
+            "passengers",
+            "amount",
+            "fee",
+            "status",
+            "created_at",
         ]
         read_only_fields = ["booking_reference", "status", "created_at"]
 

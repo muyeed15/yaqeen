@@ -12,8 +12,15 @@ class UserSerializerTest(TestCase):
     def test_serializer_contains_expected_fields(self):
         serializer = UserSerializer(self.user)
         expected = {
-            "id", "phone", "full_name", "nid", "role", "is_verified",
-            "is_active", "has_merchant_profile", "created_at",
+            "id",
+            "phone",
+            "full_name",
+            "nid",
+            "role",
+            "is_verified",
+            "is_active",
+            "has_merchant_profile",
+            "created_at",
         }
         self.assertEqual(set(serializer.data.keys()), expected)
 
@@ -27,8 +34,10 @@ class UserSerializerTest(TestCase):
 
     def test_merchant_profile_true(self):
         from merchants.models import Merchant
+
         Merchant.objects.create(
-            user=self.user, business_name="Shop",
+            user=self.user,
+            business_name="Shop",
             category=make_merchant_category(),
         )
         serializer = UserSerializer(self.user)
@@ -67,9 +76,20 @@ class FoundationSerializerTest(TestCase):
     def test_serializer_contains_expected_fields(self):
         serializer = FoundationSerializer(self.foundation)
         expected = {
-            "id", "organization_name", "cause", "cause_label", "cause_icon",
-            "logo", "description", "website", "contact_email",
-            "contact_phone", "is_verified", "phone", "user_id", "created_at",
+            "id",
+            "organization_name",
+            "cause",
+            "cause_label",
+            "cause_icon",
+            "logo",
+            "description",
+            "website",
+            "contact_email",
+            "contact_phone",
+            "is_verified",
+            "phone",
+            "user_id",
+            "created_at",
         }
         self.assertEqual(set(serializer.data.keys()), expected)
 

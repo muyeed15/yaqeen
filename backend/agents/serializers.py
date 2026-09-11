@@ -11,10 +11,19 @@ class AgentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Agent
         fields = [
-            "id", "full_name", "phone", "shop_name",
-            "district", "thana", "address",
-            "latitude", "longitude", "distance_km",
-            "is_verified", "status", "created_at",
+            "id",
+            "full_name",
+            "phone",
+            "shop_name",
+            "district",
+            "thana",
+            "address",
+            "latitude",
+            "longitude",
+            "distance_km",
+            "is_verified",
+            "status",
+            "created_at",
         ]
 
 
@@ -36,8 +45,15 @@ class AgentTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = AgentTransaction
         fields = [
-            "id", "user_phone", "agent_name",
-            "amount", "fee", "commission",
-            "transaction_type", "reference", "status", "created_at",
+            "id",
+            "user_phone",
+            "agent_name",
+            "amount",
+            "fee",
+            "commission",
+            "transaction_type",
+            "reference",
+            "status",
+            "created_at",
         ]
         read_only_fields = ["reference", "status", "created_at"]

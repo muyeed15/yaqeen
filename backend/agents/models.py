@@ -20,8 +20,10 @@ class Agent(models.Model):
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     is_verified = models.BooleanField(default=False)
     commission_pct = models.DecimalField(
-        max_digits=5, decimal_places=2, default=1.00,
-        help_text="Wakalah fee percentage for agent services"
+        max_digits=5,
+        decimal_places=2,
+        default=1.00,
+        help_text="Wakalah fee percentage for agent services",
     )
     daily_limit = models.DecimalField(max_digits=12, decimal_places=2, default=50000.00)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="active")
@@ -57,9 +59,7 @@ class AgentTransaction(models.Model):
         on_delete=models.CASCADE,
         related_name="agent_transactions",
     )
-    agent = models.ForeignKey(
-        Agent, on_delete=models.PROTECT, related_name="transactions"
-    )
+    agent = models.ForeignKey(Agent, on_delete=models.PROTECT, related_name="transactions")
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     fee = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     commission = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)

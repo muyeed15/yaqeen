@@ -1,8 +1,10 @@
 from django.urls import path
 
 from recharge.views import (
-    OperatorListView, DataPackListView,
-    RechargeView, RechargeHistoryView,
+    DataPackListView,
+    OperatorListView,
+    RechargeHistoryView,
+    RechargeView,
 )
 
 urlpatterns = [

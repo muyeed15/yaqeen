@@ -52,9 +52,7 @@ class BillPayment(models.Model):
         on_delete=models.CASCADE,
         related_name="bill_payments",
     )
-    biller = models.ForeignKey(
-        Biller, on_delete=models.PROTECT, related_name="payments"
-    )
+    biller = models.ForeignKey(Biller, on_delete=models.PROTECT, related_name="payments")
     account_number = models.CharField(max_length=50)
     bill_number = models.CharField(max_length=50, blank=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2)

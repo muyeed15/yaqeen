@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Reward, PointsTransaction, Offer
+from .models import Offer, PointsTransaction, Reward
 
 
 class RewardSerializer(serializers.ModelSerializer):
@@ -21,7 +21,14 @@ class OfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offer
         fields = [
-            "id", "title", "description", "points_required",
-            "cashback_amount", "cashback_pct", "category",
-            "valid_from", "valid_until", "is_active",
+            "id",
+            "title",
+            "description",
+            "points_required",
+            "cashback_amount",
+            "cashback_pct",
+            "category",
+            "valid_from",
+            "valid_until",
+            "is_active",
         ]

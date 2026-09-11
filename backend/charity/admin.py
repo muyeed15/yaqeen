@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from accounts.models import CharityCause
+
 from .models import HawlTracking, Sadaqah, SadaqahJariyah, ZakatPayment
 
 
@@ -34,6 +35,16 @@ class HawlTrackingAdmin(admin.ModelAdmin):
 
 @admin.register(SadaqahJariyah)
 class SadaqahJariyahAdmin(admin.ModelAdmin):
-    list_display = ["id", "user", "recipient", "amount", "cause", "frequency", "is_active", "next_due_date", "total_donated"]
+    list_display = [
+        "id",
+        "user",
+        "recipient",
+        "amount",
+        "cause",
+        "frequency",
+        "is_active",
+        "next_due_date",
+        "total_donated",
+    ]
     list_filter = ["is_active", "frequency"]
     search_fields = ["user__phone", "cause", "recipient__phone"]

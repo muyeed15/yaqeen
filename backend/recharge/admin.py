@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Operator, OperatorType, DataPack, RechargeTransaction
+from .models import DataPack, Operator, OperatorType, RechargeTransaction
 
 
 @admin.register(OperatorType)
@@ -25,7 +25,16 @@ class DataPackAdmin(admin.ModelAdmin):
 
 @admin.register(RechargeTransaction)
 class RechargeTransactionAdmin(admin.ModelAdmin):
-    list_display = ["reference", "user", "operator", "phone_number", "amount", "recharge_type", "status", "created_at"]
+    list_display = [
+        "reference",
+        "user",
+        "operator",
+        "phone_number",
+        "amount",
+        "recharge_type",
+        "status",
+        "created_at",
+    ]
     list_filter = ["recharge_type", "status", "operator"]
     search_fields = ["reference", "phone_number", "user__phone"]
     ordering = ["-created_at"]

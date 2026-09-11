@@ -1,6 +1,6 @@
 from django.urls import path
 
-from rewards.views import RewardView, PointsHistoryView, OfferListView, ClaimOfferView
+from rewards.views import ClaimOfferView, OfferListView, PointsHistoryView, RewardView
 
 urlpatterns = [
     path("rewards/", RewardView.as_view(), name="rewards"),

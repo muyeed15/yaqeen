@@ -11,8 +11,12 @@ class MerchantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Merchant
         fields = [
-            "id", "business_name", "category", "category_label",
-            "is_verified", "phone",
+            "id",
+            "business_name",
+            "category",
+            "category_label",
+            "is_verified",
+            "phone",
         ]
         read_only_fields = ["is_verified"]
 
@@ -40,9 +44,7 @@ class MerchantPaySerializer(serializers.Serializer):
             )
         except Merchant.DoesNotExist:
             raise serializers.ValidationError(
-                {
-                    "merchant_phone": "No verified merchant found with this phone number."
-                }
+                {"merchant_phone": "No verified merchant found with this phone number."}
             )
         data["merchant"] = merchant
         return data

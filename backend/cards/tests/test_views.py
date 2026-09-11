@@ -21,8 +21,11 @@ class CardListCreateViewTest(TestCase):
 
     def test_list_cards(self):
         Card.objects.create(
-            user=self.user, last_four="1234", card_type="debit",
-            expiry_month=12, expiry_year=2030,
+            user=self.user,
+            last_four="1234",
+            card_type="debit",
+            expiry_month=12,
+            expiry_year=2030,
         )
         res = self.client.get("/api/cards/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -31,40 +34,52 @@ class CardListCreateViewTest(TestCase):
     def test_list_only_own_cards(self):
         other = make_user("01700000002", "2222222222")
         Card.objects.create(
-            user=other, last_four="9999", card_type="prepaid",
-            expiry_month=6, expiry_year=2029,
+            user=other,
+            last_four="9999",
+            card_type="prepaid",
+            expiry_month=6,
+            expiry_year=2029,
         )
         res = self.client.get("/api/cards/")
         self.assertEqual(res.data["count"], 0)
 
     def test_create_card_success(self):
-        res = self.client.post("/api/cards/", {
-            "card_number": "4242424242424321",
-            "card_type": "debit",
-            "expiry_month": 12,
-            "expiry_year": 2030,
-        })
+        res = self.client.post(
+            "/api/cards/",
+            {
+                "card_number": "4242424242424321",
+                "card_type": "debit",
+                "expiry_month": 12,
+                "expiry_year": 2030,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(res.data["last_four"], "4321")
         self.assertEqual(res.data["card_network"], "visa")
         self.assertEqual(Card.objects.count(), 1)
 
     def test_create_card_invalid_number(self):
-        res = self.client.post("/api/cards/", {
-            "card_number": "abc",
-            "card_type": "debit",
-            "expiry_month": 12,
-            "expiry_year": 2030,
-        })
+        res = self.client.post(
+            "/api/cards/",
+            {
+                "card_number": "abc",
+                "card_type": "debit",
+                "expiry_month": 12,
+                "expiry_year": 2030,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_card_expired_year(self):
-        res = self.client.post("/api/cards/", {
-            "card_number": "4242424242424242",
-            "card_type": "debit",
-            "expiry_month": 12,
-            "expiry_year": 2020,
-        })
+        res = self.client.post(
+            "/api/cards/",
+            {
+                "card_number": "4242424242424242",
+                "card_type": "debit",
+                "expiry_month": 12,
+                "expiry_year": 2020,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_unauthenticated(self):
@@ -73,51 +88,67 @@ class CardListCreateViewTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_create_card_defaults_to_debit(self):
-        res = self.client.post("/api/cards/", {
-            "card_number": "5234567890123456",
-            "expiry_month": 12,
-            "expiry_year": 2030,
-        })
+        res = self.client.post(
+            "/api/cards/",
+            {
+                "card_number": "5234567890123456",
+                "expiry_month": 12,
+                "expiry_year": 2030,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(res.data["card_type"], "debit")
         self.assertEqual(res.data["card_network"], "mastercard")
 
     def test_create_card_invalid_expiry_month_zero(self):
-        res = self.client.post("/api/cards/", {
-            "card_number": "4242424242424242",
-            "card_type": "debit",
-            "expiry_month": 0,
-            "expiry_year": 2030,
-        })
+        res = self.client.post(
+            "/api/cards/",
+            {
+                "card_number": "4242424242424242",
+                "card_type": "debit",
+                "expiry_month": 0,
+                "expiry_year": 2030,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_card_invalid_expiry_month_thirteen(self):
-        res = self.client.post("/api/cards/", {
-            "card_number": "4242424242424242",
-            "card_type": "debit",
-            "expiry_month": 13,
-            "expiry_year": 2030,
-        })
+        res = self.client.post(
+            "/api/cards/",
+            {
+                "card_number": "4242424242424242",
+                "card_type": "debit",
+                "expiry_month": 13,
+                "expiry_year": 2030,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_card_expired_same_year_earlier_month(self):
         from datetime import date
+
         today = date.today()
         if today.month > 1:
-            res = self.client.post("/api/cards/", {
-                "card_number": "4242424242424242",
-                "card_type": "debit",
-                "expiry_month": 1,
-                "expiry_year": today.year,
-            })
+            res = self.client.post(
+                "/api/cards/",
+                {
+                    "card_number": "4242424242424242",
+                    "card_type": "debit",
+                    "expiry_month": 1,
+                    "expiry_year": today.year,
+                },
+            )
             self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_card_expiry_month_not_provided_defaults_debit(self):
-        res = self.client.post("/api/cards/", {
-            "card_number": "4242424242424242",
-            "expiry_month": 6,
-            "expiry_year": 2030,
-        })
+        res = self.client.post(
+            "/api/cards/",
+            {
+                "card_number": "4242424242424242",
+                "expiry_month": 6,
+                "expiry_year": 2030,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(res.data["card_type"], "debit")
 
@@ -128,8 +159,11 @@ class CardBlockViewTest(TestCase):
         self.client.default_format = "json"
         self.user = make_user("01700000001", "1111111111")
         self.card = Card.objects.create(
-            user=self.user, last_four="1234", card_type="debit",
-            expiry_month=12, expiry_year=2030,
+            user=self.user,
+            last_four="1234",
+            card_type="debit",
+            expiry_month=12,
+            expiry_year=2030,
         )
         self.client.force_authenticate(user=self.user)
 
@@ -148,8 +182,11 @@ class CardBlockViewTest(TestCase):
     def test_block_other_users_card(self):
         other = make_user("01700000002", "2222222222")
         other_card = Card.objects.create(
-            user=other, last_four="5678", card_type="prepaid",
-            expiry_month=6, expiry_year=2029,
+            user=other,
+            last_four="5678",
+            card_type="prepaid",
+            expiry_month=6,
+            expiry_year=2029,
         )
         res = self.client.patch(f"/api/cards/{other_card.pk}/block/")
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
@@ -165,8 +202,12 @@ class CardUnblockViewTest(TestCase):
         self.client.default_format = "json"
         self.user = make_user("01700000001", "1111111111")
         self.card = Card.objects.create(
-            user=self.user, last_four="1234", card_type="debit",
-            expiry_month=12, expiry_year=2030, status="blocked",
+            user=self.user,
+            last_four="1234",
+            card_type="debit",
+            expiry_month=12,
+            expiry_year=2030,
+            status="blocked",
         )
         self.client.force_authenticate(user=self.user)
 
@@ -185,8 +226,12 @@ class CardUnblockViewTest(TestCase):
     def test_unblock_other_users_card(self):
         other = make_user("01700000002", "2222222222")
         other_card = Card.objects.create(
-            user=other, last_four="5678", card_type="prepaid",
-            expiry_month=6, expiry_year=2029, status="blocked",
+            user=other,
+            last_four="5678",
+            card_type="prepaid",
+            expiry_month=6,
+            expiry_year=2029,
+            status="blocked",
         )
         res = self.client.patch(f"/api/cards/{other_card.pk}/unblock/")
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)

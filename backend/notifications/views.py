@@ -70,9 +70,7 @@ class NotificationMarkAllReadView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        updated = Notification.objects.filter(user=request.user, is_read=False).update(
-            is_read=True
-        )
+        updated = Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
         return Response({"marked_read": updated})
 
 
@@ -127,9 +125,7 @@ class NotificationStreamView(APIView):
             except GeneratorExit:
                 logger.info("SSE disconnected for user=%s", user.phone)
 
-        response = StreamingHttpResponse(
-            event_stream(), content_type="text/event-stream"
-        )
+        response = StreamingHttpResponse(event_stream(), content_type="text/event-stream")
         response["Cache-Control"] = "no-cache"
         response["X-Accel-Buffering"] = "no"
         return response

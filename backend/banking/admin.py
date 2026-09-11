@@ -19,7 +19,15 @@ class BankAccountAdmin(admin.ModelAdmin):
 
 @admin.register(BankTransaction)
 class BankTransactionAdmin(admin.ModelAdmin):
-    list_display = ["reference", "user", "bank_account", "amount", "transaction_type", "status", "created_at"]
+    list_display = [
+        "reference",
+        "user",
+        "bank_account",
+        "amount",
+        "transaction_type",
+        "status",
+        "created_at",
+    ]
     list_filter = ["transaction_type", "status"]
     search_fields = ["reference", "user__phone"]
     ordering = ["-created_at"]

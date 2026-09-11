@@ -16,48 +16,69 @@ class CalculateZakatTest(TestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_wealth_above_nisab(self):
-        res = self.client.post("/api/zakat/calculate/", {
-            "total_wealth": "100000.00", "nisab_threshold": "85000.00",
-        })
+        res = self.client.post(
+            "/api/zakat/calculate/",
+            {
+                "total_wealth": "100000.00",
+                "nisab_threshold": "85000.00",
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(res.data["is_eligible"])
         self.assertEqual(res.data["zakat_due"], "2500.00")
 
     def test_wealth_below_nisab(self):
-        res = self.client.post("/api/zakat/calculate/", {
-            "total_wealth": "1000.00", "nisab_threshold": "85000.00",
-        })
+        res = self.client.post(
+            "/api/zakat/calculate/",
+            {
+                "total_wealth": "1000.00",
+                "nisab_threshold": "85000.00",
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertFalse(res.data["is_eligible"])
         self.assertEqual(res.data["zakat_due"], "0.00")
 
     def test_exact_nisab(self):
-        res = self.client.post("/api/zakat/calculate/", {
-            "total_wealth": "85000.00", "nisab_threshold": "85000.00",
-        })
+        res = self.client.post(
+            "/api/zakat/calculate/",
+            {
+                "total_wealth": "85000.00",
+                "nisab_threshold": "85000.00",
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(res.data["is_eligible"])
 
     def test_default_nisab_used(self):
-        res = self.client.post("/api/zakat/calculate/", {
-            "total_wealth": "200000.00",
-        })
+        res = self.client.post(
+            "/api/zakat/calculate/",
+            {
+                "total_wealth": "200000.00",
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data["zakat_due"], "5000.00")
 
     def test_zero_wealth(self):
-        res = self.client.post("/api/zakat/calculate/", {
-            "total_wealth": "0.00",
-        })
+        res = self.client.post(
+            "/api/zakat/calculate/",
+            {
+                "total_wealth": "0.00",
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertFalse(res.data["is_eligible"])
         self.assertEqual(res.data["zakat_due"], "0.00")
 
     def test_very_large_wealth(self):
-        res = self.client.post("/api/zakat/calculate/", {
-            "total_wealth": "999999999.99",
-            "nisab_threshold": "85000.00",
-        })
+        res = self.client.post(
+            "/api/zakat/calculate/",
+            {
+                "total_wealth": "999999999.99",
+                "nisab_threshold": "85000.00",
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertTrue(res.data["is_eligible"])
         self.assertEqual(res.data["zakat_due"], "25000000.00")
@@ -71,57 +92,80 @@ class PayZakatTest(TestCase):
         make_wallet(self.user, "10000.00")
         self.foundation_user = make_user("01700000002", "2222222222")
         from accounts.models import Foundation
+
         self.foundation = Foundation.objects.create(
-            user=self.foundation_user, organization_name="Zakat Fund",
-            registration_number="REG-001", cause=make_cause("poverty"), is_verified=True,
+            user=self.foundation_user,
+            organization_name="Zakat Fund",
+            registration_number="REG-001",
+            cause=make_cause("poverty"),
+            is_verified=True,
         )
         make_wallet(self.foundation_user, "0.00")
         self.client.force_authenticate(user=self.user)
 
     def test_pay_zakat_success(self):
-        res = self.client.post("/api/zakat/pay/", {
-            "amount": "500.00",
-            "recipient_id": self.foundation_user.pk,
-        })
+        res = self.client.post(
+            "/api/zakat/pay/",
+            {
+                "amount": "500.00",
+                "recipient_id": self.foundation_user.pk,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(ZakatPayment.objects.count(), 1)
 
     def test_pay_zakat_deducts_sender(self):
-        self.client.post("/api/zakat/pay/", {
-            "amount": "500.00",
-            "recipient_id": self.foundation_user.pk,
-        })
+        self.client.post(
+            "/api/zakat/pay/",
+            {
+                "amount": "500.00",
+                "recipient_id": self.foundation_user.pk,
+            },
+        )
         wallet = self.user.wallet
         wallet.refresh_from_db()
         self.assertEqual(wallet.balance, Decimal("9500.00"))
 
     def test_pay_zakat_credits_foundation(self):
-        self.client.post("/api/zakat/pay/", {
-            "amount": "500.00",
-            "recipient_id": self.foundation_user.pk,
-        })
+        self.client.post(
+            "/api/zakat/pay/",
+            {
+                "amount": "500.00",
+                "recipient_id": self.foundation_user.pk,
+            },
+        )
         f_wallet = self.foundation_user.wallet
         f_wallet.refresh_from_db()
         self.assertEqual(f_wallet.balance, Decimal("500.00"))
 
     def test_insufficient_balance(self):
-        res = self.client.post("/api/zakat/pay/", {
-            "amount": "99999.00",
-            "recipient_id": self.foundation_user.pk,
-        })
+        res = self.client.post(
+            "/api/zakat/pay/",
+            {
+                "amount": "99999.00",
+                "recipient_id": self.foundation_user.pk,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_unverified_foundation_rejected(self):
         unverified_user = make_user("01700000003", "3333333333")
         from accounts.models import Foundation
+
         Foundation.objects.create(
-            user=unverified_user, organization_name="Fake",
-            registration_number="REG-002", cause=make_cause("general"), is_verified=False,
+            user=unverified_user,
+            organization_name="Fake",
+            registration_number="REG-002",
+            cause=make_cause("general"),
+            is_verified=False,
         )
-        res = self.client.post("/api/zakat/pay/", {
-            "amount": "100.00",
-            "recipient_id": unverified_user.pk,
-        })
+        res = self.client.post(
+            "/api/zakat/pay/",
+            {
+                "amount": "100.00",
+                "recipient_id": unverified_user.pk,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
 
@@ -148,62 +192,84 @@ class GiveSadaqahTest(TestCase):
         make_wallet(self.user, "5000.00")
         self.foundation_user = make_user("01700000002", "2222222222")
         from accounts.models import Foundation
+
         Foundation.objects.create(
-            user=self.foundation_user, organization_name="Sadaqah Fund",
-            registration_number="REG-001", cause=make_cause("education"), is_verified=True,
+            user=self.foundation_user,
+            organization_name="Sadaqah Fund",
+            registration_number="REG-001",
+            cause=make_cause("education"),
+            is_verified=True,
         )
         make_wallet(self.foundation_user, "0.00")
         self.client.force_authenticate(user=self.user)
 
     def test_give_sadaqah_success(self):
-        res = self.client.post("/api/sadaqah/", {
-            "amount": "100.00",
-            "recipient_id": self.foundation_user.pk,
-            "cause": "education",
-        })
+        res = self.client.post(
+            "/api/sadaqah/",
+            {
+                "amount": "100.00",
+                "recipient_id": self.foundation_user.pk,
+                "cause": "education",
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Sadaqah.objects.count(), 1)
 
     def test_give_anonymous_sadaqah(self):
-        res = self.client.post("/api/sadaqah/", {
-            "amount": "100.00",
-            "recipient_id": self.foundation_user.pk,
-            "is_anonymous": True,
-        })
+        res = self.client.post(
+            "/api/sadaqah/",
+            {
+                "amount": "100.00",
+                "recipient_id": self.foundation_user.pk,
+                "is_anonymous": True,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertTrue(res.data["is_anonymous"])
 
     def test_give_sadaqah_without_cause(self):
-        res = self.client.post("/api/sadaqah/", {
-            "amount": "50.00",
-            "recipient_id": self.foundation_user.pk,
-        })
+        res = self.client.post(
+            "/api/sadaqah/",
+            {
+                "amount": "50.00",
+                "recipient_id": self.foundation_user.pk,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertIsNone(res.data.get("cause"))
 
     def test_give_sadaqah_invalid_cause(self):
-        res = self.client.post("/api/sadaqah/", {
-            "amount": "50.00",
-            "recipient_id": self.foundation_user.pk,
-            "cause": "not_a_real_cause",
-        })
+        res = self.client.post(
+            "/api/sadaqah/",
+            {
+                "amount": "50.00",
+                "recipient_id": self.foundation_user.pk,
+                "cause": "not_a_real_cause",
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_give_sadaqah_exact_balance(self):
         wallet = self.user.wallet
         wallet.balance = Decimal("100.00")
         wallet.save()
-        res = self.client.post("/api/sadaqah/", {
-            "amount": "100.00",
-            "recipient_id": self.foundation_user.pk,
-        })
+        res = self.client.post(
+            "/api/sadaqah/",
+            {
+                "amount": "100.00",
+                "recipient_id": self.foundation_user.pk,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
     def test_insufficient_balance(self):
-        res = self.client.post("/api/sadaqah/", {
-            "amount": "99999.00",
-            "recipient_id": self.foundation_user.pk,
-        })
+        res = self.client.post(
+            "/api/sadaqah/",
+            {
+                "amount": "99999.00",
+                "recipient_id": self.foundation_user.pk,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
 
@@ -264,8 +330,10 @@ class HawlTrackingViewTest(TestCase):
 
     def test_put_hawl_due_renews(self):
         from datetime import date
+
         hawl = HawlTracking.objects.create(
-            user=self.user, is_eligible=True,
+            user=self.user,
+            is_eligible=True,
             next_hawl_date=date.today(),
         )
         res = self.client.put("/api/hawl/")
@@ -283,9 +351,13 @@ class SadaqahJariyahListCreateTest(TestCase):
         make_wallet(self.user, "5000.00")
         self.foundation_user = make_user("01700000002", "2222222222")
         from accounts.models import Foundation
+
         Foundation.objects.create(
-            user=self.foundation_user, organization_name="Jariyah Fund",
-            registration_number="REG-001", cause=make_cause("water"), is_verified=True,
+            user=self.foundation_user,
+            organization_name="Jariyah Fund",
+            registration_number="REG-001",
+            cause=make_cause("water"),
+            is_verified=True,
         )
         make_wallet(self.foundation_user, "0.00")
         self.client.force_authenticate(user=self.user)
@@ -296,11 +368,14 @@ class SadaqahJariyahListCreateTest(TestCase):
         self.assertEqual(len(res.data), 0)
 
     def test_create_success(self):
-        res = self.client.post("/api/sadaqah-jariyah/", {
-            "amount": "200.00",
-            "recipient_id": self.foundation_user.pk,
-            "cause": "water",
-        })
+        res = self.client.post(
+            "/api/sadaqah-jariyah/",
+            {
+                "amount": "200.00",
+                "recipient_id": self.foundation_user.pk,
+                "cause": "water",
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(SadaqahJariyah.objects.count(), 1)
         self.assertEqual(res.data["total_donated"], "200.00")
@@ -308,17 +383,23 @@ class SadaqahJariyahListCreateTest(TestCase):
         self.assertEqual(res.data["cause_label"], "Water")
 
     def test_create_insufficient_balance(self):
-        res = self.client.post("/api/sadaqah-jariyah/", {
-            "amount": "99999.00",
-            "recipient_id": self.foundation_user.pk,
-        })
+        res = self.client.post(
+            "/api/sadaqah-jariyah/",
+            {
+                "amount": "99999.00",
+                "recipient_id": self.foundation_user.pk,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_without_cause(self):
-        res = self.client.post("/api/sadaqah-jariyah/", {
-            "amount": "100.00",
-            "recipient_id": self.foundation_user.pk,
-        })
+        res = self.client.post(
+            "/api/sadaqah-jariyah/",
+            {
+                "amount": "100.00",
+                "recipient_id": self.foundation_user.pk,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         self.assertEqual(SadaqahJariyah.objects.count(), 1)
 
@@ -326,11 +407,14 @@ class SadaqahJariyahListCreateTest(TestCase):
         wallet = self.user.wallet
         wallet.balance = Decimal("200.00")
         wallet.save()
-        res = self.client.post("/api/sadaqah-jariyah/", {
-            "amount": "200.00",
-            "recipient_id": self.foundation_user.pk,
-            "cause": "water",
-        })
+        res = self.client.post(
+            "/api/sadaqah-jariyah/",
+            {
+                "amount": "200.00",
+                "recipient_id": self.foundation_user.pk,
+                "cause": "water",
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         wallet.refresh_from_db()
         self.assertEqual(wallet.balance, Decimal("0.00"))
@@ -342,7 +426,9 @@ class SadaqahJariyahDetailTest(TestCase):
         self.client.default_format = "json"
         self.user = make_user("01700000001", "1111111111")
         self.sj = SadaqahJariyah.objects.create(
-            user=self.user, amount=Decimal("100.00"), cause=make_cause("well"),
+            user=self.user,
+            amount=Decimal("100.00"),
+            cause=make_cause("well"),
         )
         self.client.force_authenticate(user=self.user)
 
@@ -352,9 +438,12 @@ class SadaqahJariyahDetailTest(TestCase):
         self.assertEqual(res.data["cause"], "well")
 
     def test_patch_deactivate(self):
-        res = self.client.patch(f"/api/sadaqah-jariyah/{self.sj.pk}/", {
-            "is_active": False,
-        })
+        res = self.client.patch(
+            f"/api/sadaqah-jariyah/{self.sj.pk}/",
+            {
+                "is_active": False,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.sj.refresh_from_db()
         self.assertFalse(self.sj.is_active)
@@ -362,7 +451,8 @@ class SadaqahJariyahDetailTest(TestCase):
     def test_get_other_users_donation(self):
         other = make_user("01700000002", "2222222222")
         other_sj = SadaqahJariyah.objects.create(
-            user=other, amount=Decimal("50.00"),
+            user=other,
+            amount=Decimal("50.00"),
         )
         res = self.client.get(f"/api/sadaqah-jariyah/{other_sj.pk}/")
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
@@ -378,9 +468,12 @@ class SadaqahJariyahDetailTest(TestCase):
     def test_patch_reactivate(self):
         self.sj.is_active = False
         self.sj.save()
-        res = self.client.patch(f"/api/sadaqah-jariyah/{self.sj.pk}/", {
-            "is_active": True,
-        })
+        res = self.client.patch(
+            f"/api/sadaqah-jariyah/{self.sj.pk}/",
+            {
+                "is_active": True,
+            },
+        )
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.sj.refresh_from_db()
         self.assertTrue(self.sj.is_active)

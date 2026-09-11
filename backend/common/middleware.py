@@ -35,17 +35,32 @@ class RequestLoggingMiddleware:
         if status >= 500:
             logger.error(
                 "%s %s %d %.0fms [%s] user=%s",
-                method, path, status, duration, ip, user,
+                method,
+                path,
+                status,
+                duration,
+                ip,
+                user,
             )
         elif status >= 400:
             logger.warning(
                 "%s %s %d %.0fms [%s] user=%s",
-                method, path, status, duration, ip, user,
+                method,
+                path,
+                status,
+                duration,
+                ip,
+                user,
             )
         else:
             logger.info(
                 "%s %s %d %.0fms [%s] user=%s",
-                method, path, status, duration, ip, user,
+                method,
+                path,
+                status,
+                duration,
+                ip,
+                user,
             )
 
         return response

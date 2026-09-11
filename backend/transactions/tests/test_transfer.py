@@ -10,9 +10,7 @@ from transactions.models import Transaction
 
 
 def make_user(phone, nid, full_name="Test User", password="testpass123"):
-    return User.objects.create_user(
-        phone=phone, password=password, full_name=full_name, nid=nid
-    )
+    return User.objects.create_user(phone=phone, password=password, full_name=full_name, nid=nid)
 
 
 def make_wallet(user, balance="5000.00"):
@@ -41,9 +39,7 @@ class TransferViewTest(TestCase):
         self.assertEqual(self.receiver_wallet.balance, Decimal("100.00"))
 
     def test_sender_balance_reduced_by_amount_plus_fee(self):
-        self.client.post(
-            "/api/transfer/", {"receiver_phone": "01700000002", "amount": "100.00"}
-        )
+        self.client.post("/api/transfer/", {"receiver_phone": "01700000002", "amount": "100.00"})
         self.sender_wallet.refresh_from_db()
         self.assertEqual(self.sender_wallet.balance, Decimal("4898.50"))
 
@@ -87,16 +83,12 @@ class TransferViewTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_notifications_created_on_transfer(self):
-        self.client.post(
-            "/api/transfer/", {"receiver_phone": "01700000002", "amount": "100.00"}
-        )
+        self.client.post("/api/transfer/", {"receiver_phone": "01700000002", "amount": "100.00"})
         self.assertEqual(Notification.objects.filter(user=self.sender).count(), 1)
         self.assertEqual(Notification.objects.filter(user=self.receiver).count(), 1)
 
     def test_transaction_record_created(self):
-        self.client.post(
-            "/api/transfer/", {"receiver_phone": "01700000002", "amount": "100.00"}
-        )
+        self.client.post("/api/transfer/", {"receiver_phone": "01700000002", "amount": "100.00"})
         self.assertEqual(Transaction.objects.count(), 1)
         tx = Transaction.objects.first()
         self.assertEqual(tx.transaction_type, "send")

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import PaymentGateway, GatewayTransaction
+from .models import GatewayTransaction, PaymentGateway
 
 
 @admin.register(PaymentGateway)

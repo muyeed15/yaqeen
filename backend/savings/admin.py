@@ -18,7 +18,15 @@ class MudarabahContributionInline(admin.TabularInline):
 
 @admin.register(MudarabahAccount)
 class MudarabahAccountAdmin(admin.ModelAdmin):
-    list_display = ["account_number", "user", "plan", "status", "start_date", "maturity_date", "total_deposited"]
+    list_display = [
+        "account_number",
+        "user",
+        "plan",
+        "status",
+        "start_date",
+        "maturity_date",
+        "total_deposited",
+    ]
     list_filter = ["status"]
     search_fields = ["account_number", "user__phone"]
     inlines = [MudarabahContributionInline]

@@ -47,21 +47,27 @@ class CardModelTest(TestCase):
     def test_invalid_expiry_month_boundary(self):
         with self.assertRaises(Exception):
             Card.objects.create(
-                user=self.user, last_four="0000",
-                expiry_month=0, expiry_year=2030,
+                user=self.user,
+                last_four="0000",
+                expiry_month=0,
+                expiry_year=2030,
             )
 
     def test_max_expiry_month_boundary(self):
         card = Card.objects.create(
-            user=self.user, last_four="0000",
-            expiry_month=12, expiry_year=2030,
+            user=self.user,
+            last_four="0000",
+            expiry_month=12,
+            expiry_year=2030,
         )
         self.assertEqual(card.expiry_month, 12)
 
     def test_prepaid_card_type(self):
         card = Card.objects.create(
-            user=self.user, last_four="9999",
+            user=self.user,
+            last_four="9999",
             card_type="prepaid",
-            expiry_month=6, expiry_year=2030,
+            expiry_month=6,
+            expiry_year=2030,
         )
         self.assertEqual(card.card_type, "prepaid")

@@ -43,7 +43,8 @@ class NotificationDetailViewTest(TestCase):
         self.client.default_format = "json"
         self.user = make_user("01700000001", "1111111111")
         self.notification = Notification.objects.create(
-            user=self.user, message="Test notification",
+            user=self.user,
+            message="Test notification",
         )
         self.client.force_authenticate(user=self.user)
 

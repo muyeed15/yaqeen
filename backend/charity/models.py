@@ -11,17 +11,20 @@ class ZakatPayment(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="zakat_payments"
     )
     recipient = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="received_zakat",
-        help_text="Foundation receiving this zakat"
+        help_text="Foundation receiving this zakat",
     )
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     asset_type = models.CharField(
-        max_length=50, blank=True, null=True,
-        help_text="e.g., cash, gold, silver, business"
+        max_length=50, blank=True, null=True, help_text="e.g., cash, gold, silver, business"
     )
-    hawl_year = models.PositiveIntegerField(blank=True, null=True,
-                                              help_text="The lunar year this zakat covers")
+    hawl_year = models.PositiveIntegerField(
+        blank=True, null=True, help_text="The lunar year this zakat covers"
+    )
     paid_at = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -40,9 +43,12 @@ class Sadaqah(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="sadaqah_donations"
     )
     recipient = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="received_sadaqah",
-        help_text="Foundation receiving this sadaqah"
+        help_text="Foundation receiving this sadaqah",
     )
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     cause = models.ForeignKey(
@@ -72,16 +78,13 @@ class HawlTracking(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="hawl_tracking"
     )
     nisab_crossed_at = models.DateTimeField(
-        blank=True, null=True,
-        help_text="When the user's wealth first crossed the nisab threshold"
+        blank=True, null=True, help_text="When the user's wealth first crossed the nisab threshold"
     )
     next_hawl_date = models.DateField(
-        blank=True, null=True,
-        help_text="One lunar year after nisab_crossed_at; zakat becomes due"
+        blank=True, null=True, help_text="One lunar year after nisab_crossed_at; zakat becomes due"
     )
     is_eligible = models.BooleanField(
-        default=False,
-        help_text="Whether the user currently has wealth above nisab"
+        default=False, help_text="Whether the user currently has wealth above nisab"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -103,9 +106,12 @@ class SadaqahJariyah(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="sadaqah_jariyah_donations"
     )
     recipient = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="received_sadaqah_jariyah",
-        help_text="Foundation receiving this sadaqah jariyah"
+        help_text="Foundation receiving this sadaqah jariyah",
     )
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     cause = models.ForeignKey(

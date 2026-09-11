@@ -3,6 +3,7 @@ import io
 import qrcode
 from django.db.models import Count
 from django.http import HttpResponse
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -17,7 +18,6 @@ from accounts.serializers import (
 )
 from agents.models import Agent
 from common.utils import error_response
-from rest_framework import status
 
 
 class MeView(APIView):
@@ -42,7 +42,9 @@ class NomineeListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        return Response(NomineeSerializer(Nominee.objects.filter(user=request.user), many=True).data)
+        return Response(
+            NomineeSerializer(Nominee.objects.filter(user=request.user), many=True).data
+        )
 
     def post(self, request):
         serializer = NomineeSerializer(data=request.data)
@@ -78,7 +80,10 @@ class KYCVerificationView(APIView):
         serializer = KYCVerificationSerializer(kyc, data=request.data)
         serializer.is_valid(raise_exception=True)
         saved = serializer.save(user=request.user, status="pending", verified_at=None)
-        return Response(KYCVerificationSerializer(saved).data, status=status.HTTP_200_OK if kyc else status.HTTP_201_CREATED)
+        return Response(
+            KYCVerificationSerializer(saved).data,
+            status=status.HTTP_200_OK if kyc else status.HTTP_201_CREATED,
+        )
 
 
 class QRCodeView(APIView):
@@ -111,9 +116,7 @@ class PhoneLookupView(APIView):
             user = User.objects.get(phone=phone, is_active=True)
         except User.DoesNotExist:
             try:
-                agent = Agent.objects.get(
-                    phone=phone, is_verified=True, status="active"
-                )
+                agent = Agent.objects.get(phone=phone, is_verified=True, status="active")
             except Agent.DoesNotExist:
                 return error_response("No account found with this phone number.", 404)
             return Response(
@@ -132,9 +135,7 @@ class PhoneLookupView(APIView):
             {
                 "phone": user.phone,
                 "full_name": user.full_name,
-                "name": merchant.business_name
-                if is_verified_merchant
-                else user.full_name,
+                "name": merchant.business_name if is_verified_merchant else user.full_name,
                 "type": "merchant" if is_verified_merchant else "user",
                 "is_verified_merchant": is_verified_merchant,
             }
@@ -146,14 +147,10 @@ class FoundationListView(APIView):
 
     def get(self, request):
         cause = request.query_params.get("cause")
-        foundations = Foundation.objects.filter(
-            is_verified=True
-        ).select_related("user", "cause")
+        foundations = Foundation.objects.filter(is_verified=True).select_related("user", "cause")
         if cause:
             foundations = foundations.filter(cause__key=cause)
-        serializer = FoundationSerializer(
-            foundations, many=True, context={"request": request}
-        )
+        serializer = FoundationSerializer(foundations, many=True, context={"request": request})
         return Response(serializer.data)
 
 
@@ -184,13 +181,9 @@ class FoundationDetailView(APIView):
 
     def get(self, request, pk):
         try:
-            foundation = Foundation.objects.select_related(
-                "user", "cause"
-            ).get(pk=pk, is_verified=True)
+            foundation = Foundation.objects.select_related("user", "cause").get(
+                pk=pk, is_verified=True
+            )
         except Foundation.DoesNotExist:
             return error_response("Foundation not found.", 404)
-        return Response(
-            FoundationSerializer(
-                foundation, context={"request": request}
-            ).data
-        )
+        return Response(FoundationSerializer(foundation, context={"request": request}).data)

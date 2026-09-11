@@ -20,8 +20,15 @@ class SupportTicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = SupportTicket
         fields = [
-            "id", "user_phone", "subject", "category", "category_label",
-            "status", "messages", "created_at", "updated_at",
+            "id",
+            "user_phone",
+            "subject",
+            "category",
+            "category_label",
+            "status",
+            "messages",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ["status", "created_at", "updated_at"]
 

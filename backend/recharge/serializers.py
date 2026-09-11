@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Operator, DataPack, RechargeTransaction
+from .models import DataPack, Operator, RechargeTransaction
 
 
 class OperatorSerializer(serializers.ModelSerializer):
@@ -30,8 +30,14 @@ class DataPackSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataPack
         fields = [
-            "id", "operator", "operator_name", "name", "volume",
-            "validity_days", "amount", "is_active",
+            "id",
+            "operator",
+            "operator_name",
+            "name",
+            "volume",
+            "validity_days",
+            "amount",
+            "is_active",
         ]
 
 
@@ -71,7 +77,15 @@ class RechargeTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = RechargeTransaction
         fields = [
-            "id", "operator", "operator_name", "phone_number", "amount",
-            "fee", "recharge_type", "reference", "status", "created_at",
+            "id",
+            "operator",
+            "operator_name",
+            "phone_number",
+            "amount",
+            "fee",
+            "recharge_type",
+            "reference",
+            "status",
+            "created_at",
         ]
         read_only_fields = ["reference", "status", "created_at"]

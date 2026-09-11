@@ -19,7 +19,15 @@ class BillerAdmin(admin.ModelAdmin):
 
 @admin.register(BillPayment)
 class BillPaymentAdmin(admin.ModelAdmin):
-    list_display = ["reference", "user", "biller", "account_number", "amount", "status", "created_at"]
+    list_display = [
+        "reference",
+        "user",
+        "biller",
+        "account_number",
+        "amount",
+        "status",
+        "created_at",
+    ]
     list_filter = ["status", "biller"]
     search_fields = ["reference", "user__phone", "account_number"]
     ordering = ["-created_at"]

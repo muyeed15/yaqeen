@@ -44,7 +44,18 @@ class NomineeSerializer(serializers.ModelSerializer):
 class KYCVerificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = KYCVerification
-        fields = ["id", "document_type", "document_number", "date_of_birth", "address", "face_image", "status", "verified_at", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "document_type",
+            "document_number",
+            "date_of_birth",
+            "address",
+            "face_image",
+            "status",
+            "verified_at",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["status", "verified_at", "created_at", "updated_at"]
 
 
@@ -59,9 +70,20 @@ class FoundationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Foundation
         fields = [
-            "id", "organization_name", "cause", "cause_label", "cause_icon",
-            "logo", "description", "website", "contact_email",
-            "contact_phone", "is_verified", "phone", "user_id", "created_at",
+            "id",
+            "organization_name",
+            "cause",
+            "cause_label",
+            "cause_icon",
+            "logo",
+            "description",
+            "website",
+            "contact_email",
+            "contact_phone",
+            "is_verified",
+            "phone",
+            "user_id",
+            "created_at",
         ]
         read_only_fields = ["is_verified", "created_at"]
 

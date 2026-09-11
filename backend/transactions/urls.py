@@ -15,5 +15,9 @@ urlpatterns = [
     path("transactions/<int:pk>/", TransactionDetailView.as_view(), name="transaction-detail"),
     path("money-requests/", MoneyRequestListView.as_view(), name="money-request-list"),
     path("money-requests/create/", CreateMoneyRequestView.as_view(), name="money-request-create"),
-    path("money-requests/<int:pk>/respond/", RespondMoneyRequestView.as_view(), name="money-request-respond"),
+    path(
+        "money-requests/<int:pk>/respond/",
+        RespondMoneyRequestView.as_view(),
+        name="money-request-respond",
+    ),
 ]

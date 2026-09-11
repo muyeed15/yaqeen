@@ -9,14 +9,21 @@ class StatementSerializer(serializers.ModelSerializer):
     class Meta:
         model = AccountStatement
         fields = [
-            "id", "year", "month", "period",
-            "opening_balance", "closing_balance",
-            "total_credits", "total_debits",
-            "transaction_count", "generated_at",
+            "id",
+            "year",
+            "month",
+            "period",
+            "opening_balance",
+            "closing_balance",
+            "total_credits",
+            "total_debits",
+            "transaction_count",
+            "generated_at",
         ]
 
     def get_period(self, obj):
         from calendar import month_name
+
         return f"{month_name[obj.month]} {obj.year}"
 
 

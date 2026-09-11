@@ -1,7 +1,9 @@
 from django.urls import path
 
 from remittance.views import (
-    PartnerListView, ReceiveRemittanceView, RemittanceHistoryView,
+    PartnerListView,
+    ReceiveRemittanceView,
+    RemittanceHistoryView,
 )
 
 urlpatterns = [

@@ -4,13 +4,13 @@ from accounts.views import (
     FoundationCauseListView,
     FoundationDetailView,
     FoundationListView,
+    KYCVerificationView,
     MeView,
+    NomineeDeleteView,
+    NomineeListCreateView,
     PhoneLookupView,
     QRCodeView,
     WalletDetailView,
-    NomineeListCreateView,
-    NomineeDeleteView,
-    KYCVerificationView,
 )
 
 urlpatterns = [

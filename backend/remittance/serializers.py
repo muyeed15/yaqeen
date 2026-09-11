@@ -7,8 +7,13 @@ class RemittancePartnerSerializer(serializers.ModelSerializer):
     class Meta:
         model = RemittancePartner
         fields = [
-            "id", "name", "country", "currency",
-            "exchange_rate", "logo", "is_active",
+            "id",
+            "name",
+            "country",
+            "currency",
+            "exchange_rate",
+            "logo",
+            "is_active",
         ]
 
 
@@ -19,10 +24,18 @@ class RemittanceTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = RemittanceTransaction
         fields = [
-            "id", "partner", "partner_name", "partner_country",
-            "sender_name", "sender_country",
-            "amount_foreign", "amount_bdt", "exchange_rate",
-            "reference_number", "status", "created_at",
+            "id",
+            "partner",
+            "partner_name",
+            "partner_country",
+            "sender_name",
+            "sender_country",
+            "amount_foreign",
+            "amount_bdt",
+            "exchange_rate",
+            "reference_number",
+            "status",
+            "created_at",
         ]
         read_only_fields = ["reference_number", "status", "created_at"]
 

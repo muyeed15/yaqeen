@@ -41,7 +41,9 @@ class RemittanceTransaction(models.Model):
     sender_country = models.CharField(max_length=50)
     amount_foreign = models.DecimalField(max_digits=10, decimal_places=2)
     amount_bdt = models.DecimalField(max_digits=12, decimal_places=2)
-    exchange_rate = models.DecimalField(max_digits=8, decimal_places=2, help_text="Spot exchange rate per Sarraf/Hawala principles")
+    exchange_rate = models.DecimalField(
+        max_digits=8, decimal_places=2, help_text="Spot exchange rate per Sarraf/Hawala principles"
+    )
     reference_number = models.CharField(max_length=50, unique=True, editable=False)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
     created_at = models.DateTimeField(auto_now_add=True)

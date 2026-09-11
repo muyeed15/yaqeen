@@ -12,12 +12,12 @@ from rest_framework.views import APIView
 
 from accounts.models import Wallet
 from common.pagination import get_page, get_page_size, paginate
+from common.utils import daily_spent, error_response
 from merchants.models import Merchant
 from merchants.serializers import MerchantPaySerializer, MerchantSerializer
 from notifications.models import Notification
 from transactions.models import Transaction
 from transactions.serializers import TransactionSerializer
-from common.utils import daily_spent, error_response
 
 logger = logging.getLogger("merchants")
 
@@ -29,8 +29,13 @@ class MerchantListView(APIView):
         qs = (
             Merchant.verified.select_related("user", "category")
             .only(
-                "id", "business_name", "category", "is_verified",
-                "user__phone", "category__key", "category__label",
+                "id",
+                "business_name",
+                "category",
+                "is_verified",
+                "user__phone",
+                "category__key",
+                "category__label",
             )
             .order_by("business_name")
         )
@@ -65,13 +70,9 @@ class MerchantPayView(APIView):
 
         try:
             with transaction.atomic():
-                sender_wallet = Wallet.objects.select_for_update().get(
-                    user=request.user
-                )
+                sender_wallet = Wallet.objects.select_for_update().get(user=request.user)
                 try:
-                    merchant_wallet = Wallet.objects.select_for_update().get(
-                        user=merchant.user
-                    )
+                    merchant_wallet = Wallet.objects.select_for_update().get(user=merchant.user)
                 except ObjectDoesNotExist:
                     raise ValueError("Merchant wallet is unavailable.")
 
@@ -89,9 +90,7 @@ class MerchantPayView(APIView):
                 spent_today = daily_spent(request.user, today)
                 if spent_today + total_debit > sender_wallet.daily_limit:
                     remaining = max(sender_wallet.daily_limit - spent_today, Decimal("0"))
-                    raise ValueError(
-                        f"Daily limit exceeded. Remaining today: ৳{remaining}."
-                    )
+                    raise ValueError(f"Daily limit exceeded. Remaining today: ৳{remaining}.")
 
                 sender_wallet.balance -= total_debit
                 merchant_wallet.balance += amount
@@ -131,7 +130,10 @@ class MerchantPayView(APIView):
         except (ValueError, ObjectDoesNotExist) as e:
             logger.warning(
                 "MerchantPayView: %s, user=%s merchant=%s amount=%s",
-                e, request.user.phone, merchant.business_name, amount,
+                e,
+                request.user.phone,
+                merchant.business_name,
+                amount,
             )
             return error_response(str(e))
 

@@ -79,13 +79,19 @@ class FoundationListViewTest(TestCase):
     def test_list_verified_foundations(self):
         user2 = make_user("01700000002", "2222222222")
         Foundation.objects.create(
-            user=user2, organization_name="Charity One",
-            registration_number="REG-001", cause=make_cause("education"), is_verified=True,
+            user=user2,
+            organization_name="Charity One",
+            registration_number="REG-001",
+            cause=make_cause("education"),
+            is_verified=True,
         )
         user3 = make_user("01700000003", "3333333333")
         Foundation.objects.create(
-            user=user3, organization_name="Charity Two",
-            registration_number="REG-002", cause=make_cause("health"), is_verified=False,
+            user=user3,
+            organization_name="Charity Two",
+            registration_number="REG-002",
+            cause=make_cause("health"),
+            is_verified=False,
         )
         res = self.client.get("/api/foundations/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -101,8 +107,11 @@ class FoundationDetailViewTest(TestCase):
         self.client.force_authenticate(user=self.user)
         self.foundation_user = make_user("01700000002", "2222222222")
         self.foundation = Foundation.objects.create(
-            user=self.foundation_user, organization_name="Help Fund",
-            registration_number="REG-001", cause=make_cause("poverty"), is_verified=True,
+            user=self.foundation_user,
+            organization_name="Help Fund",
+            registration_number="REG-001",
+            cause=make_cause("poverty"),
+            is_verified=True,
         )
 
     def test_get_verified_foundation(self):
@@ -113,8 +122,11 @@ class FoundationDetailViewTest(TestCase):
     def test_get_unverified_foundation_returns_404(self):
         user3 = make_user("01700000003", "3333333333")
         f = Foundation.objects.create(
-            user=user3, organization_name="Hidden",
-            registration_number="REG-002", cause=make_cause("health"), is_verified=False,
+            user=user3,
+            organization_name="Hidden",
+            registration_number="REG-002",
+            cause=make_cause("health"),
+            is_verified=False,
         )
         res = self.client.get(f"/api/foundations/{f.pk}/")
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
@@ -159,8 +171,10 @@ class PhoneLookupViewTest(TestCase):
     def test_lookup_verified_merchant_name(self):
         m_user = make_user("01700000002", "2222222222", full_name="Ali Ahmed")
         Merchant.objects.create(
-            user=m_user, business_name="Aarong",
-            category=make_merchant_category(), is_verified=True,
+            user=m_user,
+            business_name="Aarong",
+            category=make_merchant_category(),
+            is_verified=True,
         )
         res = self.client.get("/api/lookup/01700000002/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)
@@ -172,8 +186,10 @@ class PhoneLookupViewTest(TestCase):
     def test_lookup_unverified_merchant_falls_back_to_user_name(self):
         m_user = make_user("01700000002", "2222222222", full_name="Ali")
         Merchant.objects.create(
-            user=m_user, business_name="Hidden Shop",
-            category=make_merchant_category(), is_verified=False,
+            user=m_user,
+            business_name="Hidden Shop",
+            category=make_merchant_category(),
+            is_verified=False,
         )
         res = self.client.get("/api/lookup/01700000002/")
         self.assertEqual(res.data["name"], "Ali")
@@ -183,10 +199,15 @@ class PhoneLookupViewTest(TestCase):
 
     def test_lookup_agent_name(self):
         Agent.objects.create(
-            full_name="Rahim Uddin", phone="01700000003",
-            nid="3333333333", shop_name="Rahim General Store",
-            district="Dhaka", thana="Mirpur", address="Mirpur 10",
-            is_verified=True, status="active",
+            full_name="Rahim Uddin",
+            phone="01700000003",
+            nid="3333333333",
+            shop_name="Rahim General Store",
+            district="Dhaka",
+            thana="Mirpur",
+            address="Mirpur 10",
+            is_verified=True,
+            status="active",
         )
         res = self.client.get("/api/lookup/01700000003/")
         self.assertEqual(res.status_code, status.HTTP_200_OK)

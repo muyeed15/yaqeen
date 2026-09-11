@@ -16,9 +16,17 @@ class BankAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = BankAccount
         fields = [
-            "id", "bank", "bank_name", "account_number", "masked_account",
-            "account_holder", "branch", "routing_number",
-            "is_primary", "is_verified", "created_at",
+            "id",
+            "bank",
+            "bank_name",
+            "account_number",
+            "masked_account",
+            "account_holder",
+            "branch",
+            "routing_number",
+            "is_primary",
+            "is_verified",
+            "created_at",
         ]
         read_only_fields = ["is_verified", "created_at"]
 
@@ -34,8 +42,15 @@ class BankTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = BankTransaction
         fields = [
-            "id", "bank_account", "bank_name", "amount", "fee",
-            "transaction_type", "reference", "status", "created_at",
+            "id",
+            "bank_account",
+            "bank_name",
+            "amount",
+            "fee",
+            "transaction_type",
+            "reference",
+            "status",
+            "created_at",
         ]
         read_only_fields = ["reference", "status", "created_at"]
 

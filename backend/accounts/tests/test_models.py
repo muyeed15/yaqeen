@@ -7,9 +7,7 @@ from common.tests.helpers import make_cause
 
 
 def make_user(phone, nid, full_name="Test User", password="testpass123"):
-    return User.objects.create_user(
-        phone=phone, password=password, full_name=full_name, nid=nid
-    )
+    return User.objects.create_user(phone=phone, password=password, full_name=full_name, nid=nid)
 
 
 def make_wallet(user, balance="5000.00"):
@@ -35,9 +33,7 @@ class UserModelTest(TestCase):
 
     def test_phone_is_required(self):
         with self.assertRaises(ValueError):
-            User.objects.create_user(
-                phone="", password="pass", full_name="No Phone", nid="111"
-            )
+            User.objects.create_user(phone="", password="pass", full_name="No Phone", nid="111")
 
 
 class WalletModelTest(TestCase):
@@ -99,9 +95,11 @@ class FoundationModelTest(TestCase):
 
     def test_all_cause_choices_valid(self):
         for i, (key, label, icon) in enumerate(
-            [("education", "Education", "GraduationCap"),
-             ("health", "Health", "HeartPulse"),
-             ("masjid", "Masjid Development", "Landmark")]
+            [
+                ("education", "Education", "GraduationCap"),
+                ("health", "Health", "HeartPulse"),
+                ("masjid", "Masjid Development", "Landmark"),
+            ]
         ):
             cause = make_cause(key, label, icon)
             phone = f"0170000{i+1:0>2}99"

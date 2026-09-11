@@ -12,7 +12,15 @@ class AgentAdmin(admin.ModelAdmin):
 
 @admin.register(AgentTransaction)
 class AgentTransactionAdmin(admin.ModelAdmin):
-    list_display = ["reference", "user", "agent", "amount", "transaction_type", "status", "created_at"]
+    list_display = [
+        "reference",
+        "user",
+        "agent",
+        "amount",
+        "transaction_type",
+        "status",
+        "created_at",
+    ]
     list_filter = ["transaction_type", "status"]
     search_fields = ["reference", "user__phone"]
     ordering = ["-created_at"]

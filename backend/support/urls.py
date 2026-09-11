@@ -1,7 +1,10 @@
 from django.urls import path
 
 from support.views import (
-    SupportCategoryListView, TicketListCreateView, TicketDetailView, TicketReplyView,
+    SupportCategoryListView,
+    TicketDetailView,
+    TicketListCreateView,
+    TicketReplyView,
 )
 
 urlpatterns = [

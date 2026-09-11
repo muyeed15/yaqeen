@@ -39,9 +39,7 @@ class Operator(models.Model):
 
 
 class DataPack(models.Model):
-    operator = models.ForeignKey(
-        Operator, on_delete=models.CASCADE, related_name="data_packs"
-    )
+    operator = models.ForeignKey(Operator, on_delete=models.CASCADE, related_name="data_packs")
     name = models.CharField(max_length=100)
     volume = models.CharField(max_length=50)
     validity_days = models.PositiveIntegerField()
@@ -76,9 +74,7 @@ class RechargeTransaction(models.Model):
         on_delete=models.CASCADE,
         related_name="recharge_transactions",
     )
-    operator = models.ForeignKey(
-        Operator, on_delete=models.PROTECT, related_name="recharges"
-    )
+    operator = models.ForeignKey(Operator, on_delete=models.PROTECT, related_name="recharges")
     phone_number = models.CharField(max_length=15)
     amount = models.DecimalField(max_digits=8, decimal_places=2)
     fee = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)

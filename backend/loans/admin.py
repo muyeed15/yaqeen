@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import QardHasanProduct, QardHasanApplication, QardHasanRepayment
+from .models import QardHasanApplication, QardHasanProduct, QardHasanRepayment
 
 
 @admin.register(QardHasanProduct)
@@ -11,7 +11,16 @@ class QardHasanProductAdmin(admin.ModelAdmin):
 
 @admin.register(QardHasanApplication)
 class QardHasanApplicationAdmin(admin.ModelAdmin):
-    list_display = ["loan_reference", "user", "product", "amount", "amount_due", "amount_paid", "status", "due_date"]
+    list_display = [
+        "loan_reference",
+        "user",
+        "product",
+        "amount",
+        "amount_due",
+        "amount_paid",
+        "status",
+        "due_date",
+    ]
     list_filter = ["status", "product"]
     search_fields = ["loan_reference", "user__phone"]
     ordering = ["-created_at"]

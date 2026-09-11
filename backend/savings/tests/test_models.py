@@ -24,15 +24,19 @@ class MudarabahPlanModelTest(TestCase):
 
     def test_zero_duration_plan(self):
         plan = MudarabahPlan.objects.create(
-            name="Zero Month", duration_months=0,
-            monthly_amount=Decimal("0.00"), profit_ratio=Decimal("0.00"),
+            name="Zero Month",
+            duration_months=0,
+            monthly_amount=Decimal("0.00"),
+            profit_ratio=Decimal("0.00"),
         )
         self.assertEqual(plan.duration_months, 0)
 
     def test_plan_with_zero_monthly_amount(self):
         plan = MudarabahPlan.objects.create(
-            name="Free Plan", duration_months=12,
-            monthly_amount=Decimal("0.00"), profit_ratio=Decimal("10.00"),
+            name="Free Plan",
+            duration_months=12,
+            monthly_amount=Decimal("0.00"),
+            profit_ratio=Decimal("10.00"),
         )
         self.assertEqual(plan.monthly_amount, Decimal("0.00"))
 
@@ -51,7 +55,8 @@ class MudarabahAccountModelTest(TestCase):
             profit_ratio=Decimal("50.00"),
         )
         self.account = MudarabahAccount.objects.create(
-            user=self.user, plan=self.plan,
+            user=self.user,
+            plan=self.plan,
         )
 
     def test_str(self):
@@ -85,7 +90,8 @@ class MudarabahContributionModelTest(TestCase):
             profit_ratio=Decimal("50.00"),
         )
         self.account = MudarabahAccount.objects.create(
-            user=self.user, plan=self.plan,
+            user=self.user,
+            plan=self.plan,
         )
         self.contribution = MudarabahContribution.objects.create(
             mudarabah_account=self.account,

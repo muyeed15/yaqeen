@@ -11,8 +11,10 @@ class QardHasanProduct(models.Model):
     max_amount = models.DecimalField(max_digits=10, decimal_places=2)
     tenure_days = models.PositiveIntegerField(help_text="Repayment period in days")
     service_fee = models.DecimalField(
-        max_digits=8, decimal_places=2, default=Decimal("0.00"),
-        help_text="Flat service fee (not percentage-based riba)"
+        max_digits=8,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        help_text="Flat service fee (not percentage-based riba)",
     )
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
@@ -51,8 +53,10 @@ class QardHasanApplication(models.Model):
     amount_due = models.DecimalField(max_digits=10, decimal_places=2)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
     hibah_given = models.DecimalField(
-        max_digits=8, decimal_places=2, default=Decimal("0.00"),
-        help_text="Voluntary gift from borrower on top of principal"
+        max_digits=8,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        help_text="Voluntary gift from borrower on top of principal",
     )
     tenure_days = models.PositiveIntegerField()
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
@@ -85,8 +89,10 @@ class QardHasanRepayment(models.Model):
     )
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     hibah = models.DecimalField(
-        max_digits=8, decimal_places=2, default=Decimal("0.00"),
-        help_text="Voluntary extra payment as gift"
+        max_digits=8,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        help_text="Voluntary extra payment as gift",
     )
     paid_at = models.DateTimeField(auto_now_add=True)
 

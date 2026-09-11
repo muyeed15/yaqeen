@@ -1,6 +1,6 @@
 from django.urls import path
 
-from statements.views import StatementListView, GenerateStatementView
+from statements.views import GenerateStatementView, StatementListView
 
 urlpatterns = [
     path("statements/", StatementListView.as_view(), name="statement-list"),

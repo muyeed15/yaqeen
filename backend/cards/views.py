@@ -1,7 +1,7 @@
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
 
 from cards.models import Card
 from cards.serializers import CardSerializer
@@ -16,12 +16,14 @@ class CardListCreateView(APIView):
     def get(self, request):
         qs = Card.objects.filter(user=request.user).order_by("-created_at")
         p = paginate(qs, get_page(request), get_page_size(request))
-        return Response({
-            "count": p["count"],
-            "total_pages": p["total_pages"],
-            "page": p["page"],
-            "results": CardSerializer(p["queryset"], many=True).data,
-        })
+        return Response(
+            {
+                "count": p["count"],
+                "total_pages": p["total_pages"],
+                "page": p["page"],
+                "results": CardSerializer(p["queryset"], many=True).data,
+            }
+        )
 
     def post(self, request):
         serializer = CardSerializer(data=request.data)

@@ -1,7 +1,10 @@
 from django.urls import path
 
 from gateway.views import (
-    GatewayInitiateView, GatewayStatusView, GatewayHistoryView, GatewayWebhookView,
+    GatewayHistoryView,
+    GatewayInitiateView,
+    GatewayStatusView,
+    GatewayWebhookView,
 )
 
 urlpatterns = [

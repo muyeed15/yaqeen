@@ -9,7 +9,9 @@ from common.utils import error_response, user_objects_or_error
 
 from .models import SupportCategory, SupportTicket, TicketMessage
 from .serializers import (
-    SupportTicketSerializer, CreateTicketSerializer, TicketReplySerializer,
+    CreateTicketSerializer,
+    SupportTicketSerializer,
+    TicketReplySerializer,
 )
 
 logger = logging.getLogger("support")
@@ -20,8 +22,7 @@ class SupportCategoryListView(APIView):
 
     def get(self, request):
         categories = [
-            {"key": c.key, "label": c.label}
-            for c in SupportCategory.objects.filter(is_active=True)
+            {"key": c.key, "label": c.label} for c in SupportCategory.objects.filter(is_active=True)
         ]
         return Response(categories)
 
@@ -30,9 +31,12 @@ class TicketListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        tickets = SupportTicket.objects.filter(
-            user=request.user
-        ).select_related("category").prefetch_related("messages").order_by("-created_at")
+        tickets = (
+            SupportTicket.objects.filter(user=request.user)
+            .select_related("category")
+            .prefetch_related("messages")
+            .order_by("-created_at")
+        )
         return Response(SupportTicketSerializer(tickets, many=True).data)
 
     def post(self, request):
@@ -41,8 +45,7 @@ class TicketListCreateView(APIView):
 
         category_key = serializer.validated_data.get("category", "")
         category = (
-            SupportCategory.objects.filter(key=category_key).first()
-            if category_key else None
+            SupportCategory.objects.filter(key=category_key).first() if category_key else None
         )
 
         ticket = SupportTicket.objects.create(
@@ -57,12 +60,8 @@ class TicketListCreateView(APIView):
             message=serializer.validated_data["message"],
         )
 
-        logger.info(
-            "New ticket: user=%s subject=%s", request.user.phone, ticket.subject
-        )
-        return Response(
-            SupportTicketSerializer(ticket).data, status=status.HTTP_201_CREATED
-        )
+        logger.info("New ticket: user=%s subject=%s", request.user.phone, ticket.subject)
+        return Response(SupportTicketSerializer(ticket).data, status=status.HTTP_201_CREATED)
 
 
 class TicketDetailView(APIView):

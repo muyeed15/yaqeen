@@ -1,6 +1,6 @@
 from django.urls import path
 
-from billpay.views import BillerCategoryListView, BillerListView, PayBillView, BillHistoryView
+from billpay.views import BillerCategoryListView, BillerListView, BillHistoryView, PayBillView
 
 urlpatterns = [
     path("biller-categories/", BillerCategoryListView.as_view(), name="biller-categories"),

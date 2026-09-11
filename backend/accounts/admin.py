@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from accounts.models import Foundation, User, Wallet, Nominee, KYCVerification, OTPVerification
+from accounts.models import Foundation, KYCVerification, Nominee, OTPVerification, User, Wallet
 
 
 @admin.register(User)

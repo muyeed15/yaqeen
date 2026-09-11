@@ -65,9 +65,7 @@ class Wallet(models.Model):
         ("frozen", "Frozen"),
     ]
 
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="wallet"
-    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="wallet")
     balance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     daily_limit = models.DecimalField(max_digits=12, decimal_places=2, default=10000.00)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="active")
@@ -91,9 +89,7 @@ class Nominee(models.Model):
         ("other", "Other"),
     ]
 
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="nominees"
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="nominees")
     full_name = models.CharField(max_length=100)
     phone = models.CharField(max_length=15)
     nid = models.CharField(max_length=20, blank=True)
@@ -124,9 +120,7 @@ class KYCVerification(models.Model):
         ("rejected", "Rejected"),
     ]
 
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="kyc_verification"
-    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="kyc_verification")
     document_type = models.CharField(max_length=20, choices=DOC_TYPE_CHOICES, default="nid")
     document_number = models.CharField(max_length=30)
     date_of_birth = models.DateField(null=True, blank=True)
@@ -179,9 +173,7 @@ class CharityCause(models.Model):
 
 
 class Foundation(models.Model):
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="foundation_profile"
-    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="foundation_profile")
     organization_name = models.CharField(max_length=200)
     registration_number = models.CharField(max_length=50, unique=True)
     cause = models.ForeignKey(

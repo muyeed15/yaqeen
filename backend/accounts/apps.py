@@ -1,5 +1,6 @@
-from django.apps import AppConfig
 from importlib import import_module
+
+from django.apps import AppConfig
 
 
 class AccountsConfig(AppConfig):

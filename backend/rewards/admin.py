@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Reward, PointsTransaction, Offer, UserOffer
+from .models import Offer, PointsTransaction, Reward, UserOffer
 
 
 @admin.register(Reward)
@@ -18,7 +18,14 @@ class PointsTransactionAdmin(admin.ModelAdmin):
 
 @admin.register(Offer)
 class OfferAdmin(admin.ModelAdmin):
-    list_display = ["title", "points_required", "cashback_amount", "valid_from", "valid_until", "is_active"]
+    list_display = [
+        "title",
+        "points_required",
+        "cashback_amount",
+        "valid_from",
+        "valid_until",
+        "is_active",
+    ]
     list_filter = ["is_active", "category"]
 
 

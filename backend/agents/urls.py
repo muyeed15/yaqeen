@@ -1,8 +1,11 @@
 from django.urls import path
 
 from agents.views import (
-    AgentListView, AgentDetailView,
-    CashInView, CashOutView, AgentTransactionHistoryView,
+    AgentDetailView,
+    AgentListView,
+    AgentTransactionHistoryView,
+    CashInView,
+    CashOutView,
 )
 
 urlpatterns = [

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import TicketCategory, TicketProvider, TicketBooking
+from .models import TicketBooking, TicketCategory, TicketProvider
 
 
 @admin.register(TicketCategory)
@@ -18,7 +18,16 @@ class TicketProviderAdmin(admin.ModelAdmin):
 
 @admin.register(TicketBooking)
 class TicketBookingAdmin(admin.ModelAdmin):
-    list_display = ["booking_reference", "user", "provider", "origin", "destination", "amount", "status", "created_at"]
+    list_display = [
+        "booking_reference",
+        "user",
+        "provider",
+        "origin",
+        "destination",
+        "amount",
+        "status",
+        "created_at",
+    ]
     list_filter = ["status", "provider"]
     search_fields = ["booking_reference", "user__phone"]
     ordering = ["-created_at"]

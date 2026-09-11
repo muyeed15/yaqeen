@@ -15,8 +15,15 @@ class MudarabahAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = MudarabahAccount
         fields = [
-            "id", "account_number", "plan", "plan_details", "status",
-            "start_date", "maturity_date", "total_deposited", "expected_payout",
+            "id",
+            "account_number",
+            "plan",
+            "plan_details",
+            "status",
+            "start_date",
+            "maturity_date",
+            "total_deposited",
+            "expected_payout",
             "created_at",
         ]
         read_only_fields = ["account_number", "total_deposited", "expected_payout", "created_at"]
