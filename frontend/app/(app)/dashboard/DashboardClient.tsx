@@ -6,9 +6,22 @@ import Image from "next/image";
 import useSWR from "swr";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import {
-  Send, Banknote, Store, CreditCard, Receipt, Landmark, Vault,
-  Heart, QrCode, Smartphone, Ticket, HandCoins, MessageCircle,
-  CircleDollarSign, Globe2, Gift,
+  Send,
+  Banknote,
+  Store,
+  CreditCard,
+  Receipt,
+  Landmark,
+  Vault,
+  Heart,
+  QrCode,
+  Smartphone,
+  Ticket,
+  HandCoins,
+  MessageCircle,
+  CircleDollarSign,
+  Globe2,
+  Gift,
 } from "lucide-react";
 import type { Wallet, Transaction, PaginatedResponse } from "@/types";
 import { formatAmount } from "@/utils/helpers";
@@ -49,8 +62,7 @@ type Props = {
 
 function sortDesc(txs: Transaction[]): Transaction[] {
   return [...txs].sort(
-    (a, b) =>
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
   );
 }
 
@@ -62,6 +74,7 @@ export default function DashboardClient({
 }: Props): React.ReactElement {
   const { data: wallet = initialWallet } = useSWR<Wallet>("/api/wallet", {
     fallbackData: initialWallet,
+    revalidateOnMount: true,
     refreshInterval: 0,
   });
   const { data: txPage } = useSWR<PaginatedResponse<Transaction>>("/api/transactions?page=1", {
@@ -69,10 +82,7 @@ export default function DashboardClient({
   });
   const rawTransactions = txPage?.results ?? initialTransactions;
 
-  const transactions = useMemo(
-    () => sortDesc(rawTransactions),
-    [rawTransactions],
-  );
+  const transactions = useMemo(() => sortDesc(rawTransactions), [rawTransactions]);
   const myPhone = wallet.user_phone;
   const active = wallet.status === "active";
   const recentTx = useMemo(() => transactions.slice(0, 5), [transactions]);
@@ -84,7 +94,13 @@ export default function DashboardClient({
       {/* Balance card */}
       <div className="bg-teal text-white py-10 pl-6 pr-6 sm:py-12 sm:pl-8 sm:pr-10 relative overflow-hidden rounded-2xl shadow-lg shadow-teal/20">
         {svgDataUri && (
-          <Image src={svgDataUri} alt="" fill unoptimized className="object-cover object-top pointer-events-none" />
+          <Image
+            src={svgDataUri}
+            alt=""
+            fill
+            unoptimized
+            className="object-cover object-top pointer-events-none"
+          />
         )}
         <div className="relative flex flex-col justify-center">
           {fullName && (
@@ -139,7 +155,10 @@ export default function DashboardClient({
           </Link>
         </div>
 
-        <div ref={listRef} className="bg-white border border-sage-mid divide-y divide-sage-mid rounded-2xl overflow-hidden shadow-sm">
+        <div
+          ref={listRef}
+          className="bg-white border border-sage-mid divide-y divide-sage-mid rounded-2xl overflow-hidden shadow-sm"
+        >
           {recentTx.length === 0 ? (
             <div className="text-center py-12">
               <Receipt className="h-8 w-8 text-sage-mid mx-auto mb-3" strokeWidth={1.5} />
@@ -148,12 +167,7 @@ export default function DashboardClient({
             </div>
           ) : (
             recentTx.map((tx) => (
-              <TransactionCard
-                key={tx.id}
-                tx={tx}
-                myPhone={myPhone}
-                relativeTime
-              />
+              <TransactionCard key={tx.id} tx={tx} myPhone={myPhone} relativeTime />
             ))
           )}
         </div>
