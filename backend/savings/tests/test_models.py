@@ -100,7 +100,9 @@ class MudarabahContributionModelTest(TestCase):
         )
 
     def test_str(self):
-        self.assertIn(f"#{self.contribution.installment_number}", str(self.contribution))
+        self.assertIn(
+            f"#{self.contribution.installment_number}", str(self.contribution)
+        )
 
     def test_default_status_paid(self):
         self.assertEqual(self.contribution.status, "paid")

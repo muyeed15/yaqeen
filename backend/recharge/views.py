@@ -27,7 +27,9 @@ class OperatorListView(APIView):
 
     def get(self, request):
         operators = Operator.objects.filter(is_active=True)
-        return Response(OperatorSerializer(operators, many=True, context={"request": request}).data)
+        return Response(
+            OperatorSerializer(operators, many=True, context={"request": request}).data
+        )
 
 
 class DataPackListView(APIView):
@@ -96,7 +98,8 @@ class RechargeView(APIView):
             note=f"{operator.name} {recharge_type.replace('_', ' ')} for {phone_number}",
             counterparty=operator.name,
             sender_message=(
-                f"You recharged ৳{amount} for {phone_number} on {operator.name}. " f"Ref: {ref}"
+                f"You recharged ৳{amount} for {phone_number} on {operator.name}. "
+                f"Ref: {ref}"
             ),
         )
 
@@ -109,7 +112,9 @@ class RechargeView(APIView):
             amount,
             ref,
         )
-        return Response(RechargeTransactionSerializer(txn).data, status=status.HTTP_201_CREATED)
+        return Response(
+            RechargeTransactionSerializer(txn).data, status=status.HTTP_201_CREATED
+        )
 
 
 class RechargeHistoryView(APIView):

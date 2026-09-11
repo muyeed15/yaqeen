@@ -37,7 +37,15 @@ class WalletSerializer(serializers.ModelSerializer):
 class NomineeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Nominee
-        fields = ["id", "full_name", "phone", "nid", "relationship", "is_primary", "created_at"]
+        fields = [
+            "id",
+            "full_name",
+            "phone",
+            "nid",
+            "relationship",
+            "is_primary",
+            "created_at",
+        ]
         read_only_fields = ["created_at"]
 
 

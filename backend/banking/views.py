@@ -46,7 +46,9 @@ class BankAccountListCreateView(APIView):
         serializer = BankAccountSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         account = serializer.save(user=request.user)
-        return Response(BankAccountSerializer(account).data, status=status.HTTP_201_CREATED)
+        return Response(
+            BankAccountSerializer(account).data, status=status.HTTP_201_CREATED
+        )
 
 
 class BankAccountDeleteView(APIView):
@@ -73,7 +75,9 @@ class AddMoneyView(APIView):
         amount = serializer.validated_data["amount"]
 
         try:
-            bank_account = BankAccount.objects.get(id=bank_account_id, user=request.user)
+            bank_account = BankAccount.objects.get(
+                id=bank_account_id, user=request.user
+            )
         except BankAccount.DoesNotExist:
             return error_response("Bank account not found.")
 
@@ -110,7 +114,9 @@ class AddMoneyView(APIView):
             amount,
             txn.reference,
         )
-        return Response(BankTransactionSerializer(txn).data, status=status.HTTP_201_CREATED)
+        return Response(
+            BankTransactionSerializer(txn).data, status=status.HTTP_201_CREATED
+        )
 
 
 class WithdrawView(APIView):
@@ -125,7 +131,9 @@ class WithdrawView(APIView):
         amount = serializer.validated_data["amount"]
 
         try:
-            bank_account = BankAccount.objects.get(id=bank_account_id, user=request.user)
+            bank_account = BankAccount.objects.get(
+                id=bank_account_id, user=request.user
+            )
         except BankAccount.DoesNotExist:
             return error_response("Bank account not found.")
 
@@ -168,7 +176,9 @@ class WithdrawView(APIView):
             fee,
             txn.reference,
         )
-        return Response(BankTransactionSerializer(txn).data, status=status.HTTP_201_CREATED)
+        return Response(
+            BankTransactionSerializer(txn).data, status=status.HTTP_201_CREATED
+        )
 
 
 class BankTransactionHistoryView(APIView):

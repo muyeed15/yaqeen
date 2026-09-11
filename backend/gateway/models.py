@@ -48,7 +48,9 @@ class GatewayTransaction(models.Model):
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     fee = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     order_id = models.CharField(max_length=100)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="initiated")
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="initiated"
+    )
     callback_data = models.JSONField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

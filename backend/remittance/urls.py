@@ -7,7 +7,15 @@ from remittance.views import (
 )
 
 urlpatterns = [
-    path("remittance-partners/", PartnerListView.as_view(), name="remittance-partner-list"),
-    path("receive-remittance/", ReceiveRemittanceView.as_view(), name="receive-remittance"),
+    path(
+        "remittance-partners/",
+        PartnerListView.as_view(),
+        name="remittance-partner-list",
+    ),
+    path(
+        "receive-remittance/",
+        ReceiveRemittanceView.as_view(),
+        name="receive-remittance",
+    ),
     path("remittances/", RemittanceHistoryView.as_view(), name="remittance-history"),
 ]

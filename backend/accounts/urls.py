@@ -22,6 +22,14 @@ urlpatterns = [
     path("qr/", QRCodeView.as_view(), name="qr-code"),
     path("lookup/<str:phone>/", PhoneLookupView.as_view(), name="phone-lookup"),
     path("foundations/", FoundationListView.as_view(), name="foundation-list"),
-    path("foundation-causes/", FoundationCauseListView.as_view(), name="foundation-causes"),
-    path("foundations/<int:pk>/", FoundationDetailView.as_view(), name="foundation-detail"),
+    path(
+        "foundation-causes/",
+        FoundationCauseListView.as_view(),
+        name="foundation-causes",
+    ),
+    path(
+        "foundations/<int:pk>/",
+        FoundationDetailView.as_view(),
+        name="foundation-detail",
+    ),
 ]

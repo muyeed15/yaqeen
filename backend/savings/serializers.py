@@ -6,7 +6,14 @@ from .models import MudarabahAccount, MudarabahContribution, MudarabahPlan
 class MudarabahPlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = MudarabahPlan
-        fields = ["id", "name", "duration_months", "monthly_amount", "profit_ratio", "is_active"]
+        fields = [
+            "id",
+            "name",
+            "duration_months",
+            "monthly_amount",
+            "profit_ratio",
+            "is_active",
+        ]
 
 
 class MudarabahAccountSerializer(serializers.ModelSerializer):
@@ -26,13 +33,25 @@ class MudarabahAccountSerializer(serializers.ModelSerializer):
             "expected_payout",
             "created_at",
         ]
-        read_only_fields = ["account_number", "total_deposited", "expected_payout", "created_at"]
+        read_only_fields = [
+            "account_number",
+            "total_deposited",
+            "expected_payout",
+            "created_at",
+        ]
 
 
 class MudarabahContributionSerializer(serializers.ModelSerializer):
     class Meta:
         model = MudarabahContribution
-        fields = ["id", "mudarabah_account", "installment_number", "amount", "status", "paid_at"]
+        fields = [
+            "id",
+            "mudarabah_account",
+            "installment_number",
+            "amount",
+            "status",
+            "paid_at",
+        ]
         read_only_fields = ["paid_at"]
 
 

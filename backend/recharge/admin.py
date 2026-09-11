@@ -19,7 +19,14 @@ class OperatorAdmin(admin.ModelAdmin):
 
 @admin.register(DataPack)
 class DataPackAdmin(admin.ModelAdmin):
-    list_display = ["name", "operator", "volume", "validity_days", "amount", "is_active"]
+    list_display = [
+        "name",
+        "operator",
+        "volume",
+        "validity_days",
+        "amount",
+        "is_active",
+    ]
     list_filter = ["operator", "is_active"]
 
 

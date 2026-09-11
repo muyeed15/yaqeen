@@ -372,7 +372,9 @@ class Command(BaseCommand):
                 is_verified=random.choices([True, False], weights=[80, 20])[0],
             )
             user.wallet.balance = Decimal(str(random.randint(500, 50000)))
-            user.wallet.status = random.choices(["active", "frozen"], weights=[90, 10])[0]
+            user.wallet.status = random.choices(["active", "frozen"], weights=[90, 10])[
+                0
+            ]
             user.wallet.save(update_fields=["balance", "status"])
             users.append(user)
         return users
@@ -401,7 +403,9 @@ class Command(BaseCommand):
                     status="active",
                     card_network=random.choice(["visa", "mastercard"]),
                 )
-                card.set_number("4" + str(random.randint(100000000000000, 999999999999999))[:15])
+                card.set_number(
+                    "4" + str(random.randint(100000000000000, 999999999999999))[:15]
+                )
                 card.save()
             team.append(user)
             self.stdout.write(f"  + {name} {phone}  ৳{user.wallet.balance}")
@@ -424,7 +428,13 @@ class Command(BaseCommand):
                 transaction_type="send",
                 status="completed",
                 note=random.choice(
-                    ["Lunch bill", "Chai party", "Team dinner", "Gift contrib", "Travel fare"]
+                    [
+                        "Lunch bill",
+                        "Chai party",
+                        "Team dinner",
+                        "Gift contrib",
+                        "Travel fare",
+                    ]
                 ),
                 created_at=self._past(60),
             )
@@ -632,9 +642,9 @@ class Command(BaseCommand):
                     cardholder_name=user.full_name,
                     expiry_month=random.randint(1, 12),
                     expiry_year=random.randint(2025, 2030),
-                    status=random.choices(["active", "blocked", "expired"], weights=[80, 10, 10])[
-                        0
-                    ],
+                    status=random.choices(
+                        ["active", "blocked", "expired"], weights=[80, 10, 10]
+                    )[0],
                 )
                 card.set_number(raw)
                 card.save()
@@ -762,7 +772,9 @@ class Command(BaseCommand):
                 latitude=Decimal(str(23.75 + random.random() * 2)),
                 longitude=Decimal(str(90.35 + random.random() * 2)),
                 is_verified=True,
-                commission_pct=Decimal(str(random.choice(["0.50", "0.80", "1.00", "1.20"]))),
+                commission_pct=Decimal(
+                    str(random.choice(["0.50", "0.80", "1.00", "1.20"]))
+                ),
             )
             agents.append(a)
         self.stdout.write(f"  + {len(agents)} agents")
@@ -772,8 +784,20 @@ class Command(BaseCommand):
         products = []
         for name, min_a, max_a, days, fee in [
             ("Qard Hasan Small", Decimal("500"), Decimal("5000"), 30, Decimal("0.00")),
-            ("Qard Hasan Medium", Decimal("1000"), Decimal("10000"), 60, Decimal("50.00")),
-            ("Qard Hasan Large", Decimal("5000"), Decimal("50000"), 90, Decimal("100.00")),
+            (
+                "Qard Hasan Medium",
+                Decimal("1000"),
+                Decimal("10000"),
+                60,
+                Decimal("50.00"),
+            ),
+            (
+                "Qard Hasan Large",
+                Decimal("5000"),
+                Decimal("50000"),
+                90,
+                Decimal("100.00"),
+            ),
         ]:
             p = QardHasanProduct.objects.create(
                 name=name,
@@ -903,8 +927,24 @@ class Command(BaseCommand):
                 ),
             ],
             "cinema": [
-                ("The Blockbuster", "", "", "03:00 PM", "06:00 PM", "Regular", Decimal("300")),
-                ("Avenger Returns", "", "", "06:30 PM", "09:30 PM", "Premium", Decimal("500")),
+                (
+                    "The Blockbuster",
+                    "",
+                    "",
+                    "03:00 PM",
+                    "06:00 PM",
+                    "Regular",
+                    Decimal("300"),
+                ),
+                (
+                    "Avenger Returns",
+                    "",
+                    "",
+                    "06:30 PM",
+                    "09:30 PM",
+                    "Premium",
+                    Decimal("500"),
+                ),
             ],
             "ferry": [
                 (
@@ -916,7 +956,15 @@ class Command(BaseCommand):
                     "Cabin",
                     Decimal("600"),
                 ),
-                ("MV Sundarban", "Dhaka", "Khulna", "07:00 PM", "07:00 AM", "Deck", Decimal("350")),
+                (
+                    "MV Sundarban",
+                    "Dhaka",
+                    "Khulna",
+                    "07:00 PM",
+                    "07:00 AM",
+                    "Deck",
+                    Decimal("350"),
+                ),
             ],
             "event": [
                 (
@@ -1091,7 +1139,9 @@ class Command(BaseCommand):
                 fee=fee,
                 transaction_type="cash_out",
                 status="completed",
-                note=random.choice(["ATM withdrawal", "Agent cash out", "Emergency cash"]),
+                note=random.choice(
+                    ["ATM withdrawal", "Agent cash out", "Emergency cash"]
+                ),
                 created_at=self._past(),
             )
 
@@ -1106,13 +1156,17 @@ class Command(BaseCommand):
             txn_type = random.choice(["cash_in", "cash_out"])
             if txn_type == "cash_out":
                 self._ensure_balance(user.wallet, amount)
-                fee = (amount * Decimal("1.8") / Decimal("100")).quantize(Decimal("0.01"))
+                fee = (amount * Decimal("1.8") / Decimal("100")).quantize(
+                    Decimal("0.01")
+                )
                 user.wallet.balance -= amount + fee
             else:
                 user.wallet.balance += amount
                 fee = Decimal("0.00")
             user.wallet.save(update_fields=["balance"])
-            commission = (amount * agent.commission_pct / Decimal("100")).quantize(Decimal("0.01"))
+            commission = (amount * agent.commission_pct / Decimal("100")).quantize(
+                Decimal("0.01")
+            )
             AgentTransaction.objects.create(
                 user=user,
                 agent=agent,
@@ -1186,7 +1240,7 @@ class Command(BaseCommand):
                 account_number=str(random.randint(100000000, 999999999)),
                 amount=amount,
                 fee=Decimal("0.00"),
-                bill_month=f"{random.randint(1,12):02d}/2026",
+                bill_month=f"{random.randint(1, 12):02d}/2026",
                 reference="BILL" + str(random.randint(10000000, 99999999)),
                 status="completed",
                 created_at=self._past(),
@@ -1208,7 +1262,11 @@ class Command(BaseCommand):
             user_bank_map[ba.user_id] = ba
 
         for _ in range(15):
-            candidates = [u for u in users if u.id in user_bank_map and u.wallet.status == "active"]
+            candidates = [
+                u
+                for u in users
+                if u.id in user_bank_map and u.wallet.status == "active"
+            ]
             if not candidates:
                 break
             user = random.choice(candidates)
@@ -1217,7 +1275,9 @@ class Command(BaseCommand):
             txn_type = random.choice(["add_money", "withdraw"])
             if txn_type == "withdraw":
                 self._ensure_balance(user.wallet, amount)
-                fee = (amount * Decimal("0.5") / Decimal("100")).quantize(Decimal("0.01"))
+                fee = (amount * Decimal("0.5") / Decimal("100")).quantize(
+                    Decimal("0.01")
+                )
                 user.wallet.balance -= amount + fee
             else:
                 user.wallet.balance += amount
@@ -1252,7 +1312,9 @@ class Command(BaseCommand):
             if user.wallet.status != "active":
                 continue
             product = random.choice(products)
-            amount = Decimal(str(random.randint(int(product.min_amount), int(product.max_amount))))
+            amount = Decimal(
+                str(random.randint(int(product.min_amount), int(product.max_amount)))
+            )
             due = amount + product.service_fee
             if product.service_fee > 0:
                 self._ensure_balance(user.wallet, product.service_fee + amount)
@@ -1323,7 +1385,9 @@ class Command(BaseCommand):
 
     def _seed_ticket_bookings(self, users, providers):
         count = 0
-        trips = list(TicketTrip.objects.filter(is_active=True).select_related("provider"))
+        trips = list(
+            TicketTrip.objects.filter(is_active=True).select_related("provider")
+        )
         for _ in range(12):
             user = random.choice(users)
             if user.wallet.status != "active":
@@ -1343,8 +1407,10 @@ class Command(BaseCommand):
                 destination=trip.destination,
                 trip_name=trip.name,
                 coach_class=trip.coach_class,
-                coach=str(random.randint(1, 10)) if provider.category in ("bus", "train") else "",
-                seat_number=f"{random.choice('ABCD')}{random.randint(1,20)}",
+                coach=str(random.randint(1, 10))
+                if provider.category in ("bus", "train")
+                else "",
+                seat_number=f"{random.choice('ABCD')}{random.randint(1, 20)}",
                 passengers=random.randint(1, 3),
                 amount=amount * random.randint(1, 2),
                 status="confirmed",
@@ -1431,7 +1497,9 @@ class Command(BaseCommand):
         notifications = [
             Notification(
                 user=random.choice(users),
-                message=random.choice(templates).format(amount=random.randint(50, 10000)),
+                message=random.choice(templates).format(
+                    amount=random.randint(50, 10000)
+                ),
                 is_read=random.choices([True, False], weights=[40, 60])[0],
             )
             for _ in range(50)
@@ -1446,8 +1514,10 @@ class Command(BaseCommand):
                 user=user,
                 defaults={
                     "is_eligible": True,
-                    "nisab_crossed_at": timezone.now() - timedelta(days=random.randint(30, 300)),
-                    "next_hawl_date": date.today() + timedelta(days=random.randint(30, 120)),
+                    "nisab_crossed_at": timezone.now()
+                    - timedelta(days=random.randint(30, 300)),
+                    "next_hawl_date": date.today()
+                    + timedelta(days=random.randint(30, 120)),
                 },
             )
             count += 1
@@ -1533,9 +1603,13 @@ class Command(BaseCommand):
         self.stdout.write(f"  Agents           : {Agent.objects.count()}")
         self.stdout.write(f"  Agent Txs        : {AgentTransaction.objects.count()}")
         self.stdout.write(f"  Qard Hasan Prods : {QardHasanProduct.objects.count()}")
-        self.stdout.write(f"  Qard Hasan Loans : {QardHasanApplication.objects.count()}")
+        self.stdout.write(
+            f"  Qard Hasan Loans : {QardHasanApplication.objects.count()}"
+        )
         self.stdout.write(f"  Remit Partners   : {RemittancePartner.objects.count()}")
-        self.stdout.write(f"  Remittances      : {RemittanceTransaction.objects.count()}")
+        self.stdout.write(
+            f"  Remittances      : {RemittanceTransaction.objects.count()}"
+        )
         self.stdout.write(f"  Ticket Providers : {TicketProvider.objects.count()}")
         self.stdout.write(f"  Bookings         : {TicketBooking.objects.count()}")
         self.stdout.write(f"  Mudarabah Accts  : {MudarabahAccount.objects.count()}")

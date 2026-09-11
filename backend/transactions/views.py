@@ -52,7 +52,9 @@ class TransactionListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        p = paginate(_transaction_qs(request.user), get_page(request), get_page_size(request))
+        p = paginate(
+            _transaction_qs(request.user), get_page(request), get_page_size(request)
+        )
         return Response(
             {
                 "count": p["count"],
@@ -94,7 +96,9 @@ class TransferView(APIView):
 
         try:
             with transaction.atomic():
-                sender_wallet = Wallet.objects.select_for_update().get(user=request.user)
+                sender_wallet = Wallet.objects.select_for_update().get(
+                    user=request.user
+                )
                 try:
                     receiver_wallet = (
                         Wallet.objects.select_for_update()
@@ -117,8 +121,12 @@ class TransferView(APIView):
                 today = timezone.now().date()
                 spent_today = daily_spent(request.user, today)
                 if spent_today + total_debit > sender_wallet.daily_limit:
-                    remaining = max(sender_wallet.daily_limit - spent_today, Decimal("0"))
-                    raise ValueError(f"Daily limit exceeded. Remaining today: ৳{remaining}.")
+                    remaining = max(
+                        sender_wallet.daily_limit - spent_today, Decimal("0")
+                    )
+                    raise ValueError(
+                        f"Daily limit exceeded. Remaining today: ৳{remaining}."
+                    )
 
                 sender_wallet.balance -= total_debit
                 receiver_wallet.balance += amount
@@ -172,7 +180,9 @@ class MoneyRequestListView(APIView):
 
     def get(self, request):
         qs = (
-            MoneyRequest.objects.filter(Q(requester=request.user) | Q(target=request.user))
+            MoneyRequest.objects.filter(
+                Q(requester=request.user) | Q(target=request.user)
+            )
             .select_related("requester", "target")
             .order_by("-created_at")
         )
@@ -217,7 +227,9 @@ class CreateMoneyRequestView(APIView):
             message=(f"{request.user.phone} requested ৳{amount} from you. "),
         )
 
-        return Response(MoneyRequestSerializer(money_req).data, status=status.HTTP_201_CREATED)
+        return Response(
+            MoneyRequestSerializer(money_req).data, status=status.HTTP_201_CREATED
+        )
 
 
 class RespondMoneyRequestView(APIView):
@@ -228,7 +240,9 @@ class RespondMoneyRequestView(APIView):
         action = request.data.get("action")
 
         try:
-            money_req = MoneyRequest.objects.get(pk=pk, target=request.user, status="pending")
+            money_req = MoneyRequest.objects.get(
+                pk=pk, target=request.user, status="pending"
+            )
         except MoneyRequest.DoesNotExist:
             return error_response("Money request not found or already handled.", 404)
 
@@ -238,7 +252,9 @@ class RespondMoneyRequestView(APIView):
             total = money_req.amount + fee
 
             sender_wallet = Wallet.objects.select_for_update().get(user=request.user)
-            receiver_wallet = Wallet.objects.select_for_update().get(user=money_req.requester)
+            receiver_wallet = Wallet.objects.select_for_update().get(
+                user=money_req.requester
+            )
 
             if sender_wallet.status != "active":
                 return error_response("Your wallet is frozen.")
@@ -257,7 +273,9 @@ class RespondMoneyRequestView(APIView):
                 fee=fee,
                 transaction_type="send",
                 status="completed",
-                note=f"Request: {money_req.note}" if money_req.note else "Money request",
+                note=f"Request: {money_req.note}"
+                if money_req.note
+                else "Money request",
             )
 
             money_req.status = "accepted"

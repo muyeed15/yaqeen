@@ -70,9 +70,13 @@ class MerchantPayView(APIView):
 
         try:
             with transaction.atomic():
-                sender_wallet = Wallet.objects.select_for_update().get(user=request.user)
+                sender_wallet = Wallet.objects.select_for_update().get(
+                    user=request.user
+                )
                 try:
-                    merchant_wallet = Wallet.objects.select_for_update().get(user=merchant.user)
+                    merchant_wallet = Wallet.objects.select_for_update().get(
+                        user=merchant.user
+                    )
                 except ObjectDoesNotExist:
                     raise ValueError("Merchant wallet is unavailable.")
 
@@ -89,8 +93,12 @@ class MerchantPayView(APIView):
                 today = timezone.now().date()
                 spent_today = daily_spent(request.user, today)
                 if spent_today + total_debit > sender_wallet.daily_limit:
-                    remaining = max(sender_wallet.daily_limit - spent_today, Decimal("0"))
-                    raise ValueError(f"Daily limit exceeded. Remaining today: ৳{remaining}.")
+                    remaining = max(
+                        sender_wallet.daily_limit - spent_today, Decimal("0")
+                    )
+                    raise ValueError(
+                        f"Daily limit exceeded. Remaining today: ৳{remaining}."
+                    )
 
                 sender_wallet.balance -= total_debit
                 merchant_wallet.balance += amount

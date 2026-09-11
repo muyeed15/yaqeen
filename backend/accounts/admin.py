@@ -1,11 +1,25 @@
 from django.contrib import admin
 
-from accounts.models import Foundation, KYCVerification, Nominee, OTPVerification, User, Wallet
+from accounts.models import (
+    Foundation,
+    KYCVerification,
+    Nominee,
+    OTPVerification,
+    User,
+    Wallet,
+)
 
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ("phone", "full_name", "role", "is_verified", "is_active", "created_at")
+    list_display = (
+        "phone",
+        "full_name",
+        "role",
+        "is_verified",
+        "is_active",
+        "created_at",
+    )
     list_filter = ("role", "is_verified", "is_active")
     search_fields = ("phone", "full_name", "nid")
     readonly_fields = ("created_at",)

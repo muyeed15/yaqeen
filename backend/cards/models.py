@@ -35,12 +35,16 @@ class Card(models.Model):
         on_delete=models.CASCADE,
         related_name="cards",
     )
-    card_network = models.CharField(max_length=12, choices=CARD_NETWORK_CHOICES, default="visa")
+    card_network = models.CharField(
+        max_length=12, choices=CARD_NETWORK_CHOICES, default="visa"
+    )
     last_four = models.CharField(max_length=4, editable=False, default="****")
     masked_number = models.CharField(max_length=19, editable=False, default="****")
     _number = models.TextField(db_column="card_number", default="")
     cardholder_name = models.CharField(max_length=100, default="")
-    card_type = models.CharField(max_length=10, choices=CARD_TYPE_CHOICES, default="debit")
+    card_type = models.CharField(
+        max_length=10, choices=CARD_TYPE_CHOICES, default="debit"
+    )
     expiry_month = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(12)]
     )

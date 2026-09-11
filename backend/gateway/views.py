@@ -38,7 +38,9 @@ class GatewayInitiateView(APIView):
             return error_response("Amount must be greater than zero.")
 
         try:
-            gateway = PaymentGateway.objects.get(merchant_id=merchant_id, is_active=True)
+            gateway = PaymentGateway.objects.get(
+                merchant_id=merchant_id, is_active=True
+            )
         except PaymentGateway.DoesNotExist:
             return error_response("Invalid or inactive merchant gateway.", 404)
 
@@ -76,7 +78,8 @@ class GatewayInitiateView(APIView):
                 f"gateway. Ref: {txn.txn_id}"
             ),
             receiver_message=(
-                f"Gateway payment of ৳{amount} received at {merchant_name}. " f"Ref: {txn.txn_id}"
+                f"Gateway payment of ৳{amount} received at {merchant_name}. "
+                f"Ref: {txn.txn_id}"
             ),
         )
 
@@ -88,7 +91,9 @@ class GatewayInitiateView(APIView):
             fee,
             txn.txn_id,
         )
-        return Response(GatewayTransactionSerializer(txn).data, status=status.HTTP_201_CREATED)
+        return Response(
+            GatewayTransactionSerializer(txn).data, status=status.HTTP_201_CREATED
+        )
 
 
 class GatewayStatusView(APIView):
@@ -125,7 +130,6 @@ class GatewayHistoryView(APIView):
 
 
 class GatewayWebhookView(APIView):
-
     def post(self, request):
         api_key = request.headers.get("X-Api-Key")
         if not api_key:

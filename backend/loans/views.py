@@ -86,7 +86,8 @@ class ApplyQardHasanView(APIView):
                 note=f"{product.name} service fee",
                 counterparty=product.name,
                 sender_message=(
-                    f"Qard Hasan service fee of ৳{service_fee} charged for " f"{product.name}."
+                    f"Qard Hasan service fee of ৳{service_fee} charged for "
+                    f"{product.name}."
                 ),
             )
 
@@ -111,7 +112,8 @@ class ApplyQardHasanView(APIView):
             application.loan_reference,
         )
         return Response(
-            QardHasanApplicationSerializer(application).data, status=status.HTTP_201_CREATED
+            QardHasanApplicationSerializer(application).data,
+            status=status.HTTP_201_CREATED,
         )
 
 
@@ -130,7 +132,9 @@ class QardHasanListView(APIView):
                 "count": p["count"],
                 "total_pages": p["total_pages"],
                 "page": p["page"],
-                "results": QardHasanApplicationSerializer(p["queryset"], many=True).data,
+                "results": QardHasanApplicationSerializer(
+                    p["queryset"], many=True
+                ).data,
             }
         )
 

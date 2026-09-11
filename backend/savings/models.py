@@ -37,15 +37,23 @@ class MudarabahAccount(models.Model):
     ]
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="mudarabah_accounts"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="mudarabah_accounts",
     )
-    plan = models.ForeignKey(MudarabahPlan, on_delete=models.PROTECT, related_name="accounts")
+    plan = models.ForeignKey(
+        MudarabahPlan, on_delete=models.PROTECT, related_name="accounts"
+    )
     account_number = models.CharField(max_length=12, unique=True, editable=False)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="active")
     start_date = models.DateField(default=timezone.localdate)
     maturity_date = models.DateField()
-    total_deposited = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
-    expected_payout = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))
+    total_deposited = models.DecimalField(
+        max_digits=12, decimal_places=2, default=Decimal("0.00")
+    )
+    expected_payout = models.DecimalField(
+        max_digits=12, decimal_places=2, default=Decimal("0.00")
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -58,7 +66,9 @@ class MudarabahAccount(models.Model):
         if not self.account_number:
             self.account_number = "MUD" + uuid.uuid4().hex[:9].upper()
         if not self.maturity_date:
-            self.maturity_date = self.start_date + relativedelta(months=self.plan.duration_months)
+            self.maturity_date = self.start_date + relativedelta(
+                months=self.plan.duration_months
+            )
         super().save(*args, **kwargs)
 
     def update_expected_payout(self):

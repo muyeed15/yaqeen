@@ -15,7 +15,9 @@ def _detect_network(digits):
 
 class CardSerializer(serializers.ModelSerializer):
     card_number = serializers.CharField(write_only=True, max_length=19)
-    cardholder_name = serializers.CharField(required=False, allow_blank=True, max_length=100)
+    cardholder_name = serializers.CharField(
+        required=False, allow_blank=True, max_length=100
+    )
     card_network = serializers.CharField(required=False, max_length=12)
 
     class Meta:
@@ -49,7 +51,9 @@ class CardSerializer(serializers.ModelSerializer):
         digits = self.initial_data.get("card_number", "").replace(" ", "")
         expected = CARD_NETWORKS.get(value, "")
         if expected and digits[:1] != expected:
-            raise serializers.ValidationError(f"Card number does not match {value} network.")
+            raise serializers.ValidationError(
+                f"Card number does not match {value} network."
+            )
         return value
 
     def validate_expiry_month(self, value):

@@ -49,7 +49,9 @@ class OfferListView(APIView):
 
     def get(self, request):
         now = timezone.now()
-        offers = Offer.objects.filter(is_active=True, valid_from__lte=now, valid_until__gte=now)
+        offers = Offer.objects.filter(
+            is_active=True, valid_from__lte=now, valid_until__gte=now
+        )
         return Response(OfferSerializer(offers, many=True).data)
 
 
@@ -89,7 +91,9 @@ class ClaimOfferView(APIView):
 
         Notification.objects.create(
             user=request.user,
-            message=(f"You redeemed {offer.points_required} points for " f"'{offer.title}'."),
+            message=(
+                f"You redeemed {offer.points_required} points for '{offer.title}'."
+            ),
         )
 
         return Response({"message": f"Offer '{offer.title}' claimed successfully."})

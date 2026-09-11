@@ -64,11 +64,14 @@ class MudarabahAccountListCreate(APIView):
             note=f"{plan.name} installment 1",
             counterparty=plan.name,
             sender_message=(
-                f"You paid ৳{plan.monthly_amount} as the first contribution to " f"{plan.name}."
+                f"You paid ৳{plan.monthly_amount} as the first contribution to "
+                f"{plan.name}."
             ),
         )
 
-        return Response(MudarabahAccountSerializer(account).data, status=status.HTTP_201_CREATED)
+        return Response(
+            MudarabahAccountSerializer(account).data, status=status.HTTP_201_CREATED
+        )
 
 
 class MudarabahAccountDetail(APIView):
@@ -124,7 +127,9 @@ class PayMudarabahContribution(APIView):
             .order_by("-installment_number")
             .first()
         )
-        next_number = (last_contribution.installment_number + 1) if last_contribution else 1
+        next_number = (
+            (last_contribution.installment_number + 1) if last_contribution else 1
+        )
 
         if next_number > account.plan.duration_months:
             return error_response("All contributions already paid")
@@ -149,7 +154,8 @@ class PayMudarabahContribution(APIView):
             note=f"{account.plan.name} installment {next_number}",
             counterparty=account.plan.name,
             sender_message=(
-                f"You paid ৳{amount} for {account.plan.name} installment " f"#{next_number}."
+                f"You paid ৳{amount} for {account.plan.name} installment "
+                f"#{next_number}."
             ),
         )
 

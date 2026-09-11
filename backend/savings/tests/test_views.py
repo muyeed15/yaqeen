@@ -152,7 +152,9 @@ class MudarabahAccountDetailTest(TestCase):
     def test_get_other_users_account(self):
         other = make_user("01700000002", "2222222222")
         other_account = MudarabahAccount.objects.create(user=other, plan=self.plan)
-        res = self.client.get(f"/api/mudarabah/accounts/{other_account.account_number}/")
+        res = self.client.get(
+            f"/api/mudarabah/accounts/{other_account.account_number}/"
+        )
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
 

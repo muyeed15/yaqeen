@@ -39,7 +39,13 @@ class QardHasanApplicationSerializer(serializers.ModelSerializer):
             "disbursed_at",
             "created_at",
         ]
-        read_only_fields = ["loan_reference", "status", "due_date", "disbursed_at", "created_at"]
+        read_only_fields = [
+            "loan_reference",
+            "status",
+            "due_date",
+            "disbursed_at",
+            "created_at",
+        ]
 
 
 class ApplyQardHasanSerializer(serializers.Serializer):
@@ -54,7 +60,9 @@ class ApplyQardHasanSerializer(serializers.Serializer):
 
 class RepayQardHasanSerializer(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=10, decimal_places=2)
-    hibah = serializers.DecimalField(max_digits=8, decimal_places=2, required=False, default=0.00)
+    hibah = serializers.DecimalField(
+        max_digits=8, decimal_places=2, required=False, default=0.00
+    )
 
     def validate_amount(self, value):
         if value <= 0:

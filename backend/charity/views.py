@@ -74,7 +74,9 @@ class PayZakat(APIView):
         amount = serializer.validated_data["amount"]
         recipient_id = serializer.validated_data["recipient_id"]
 
-        foundation = user_objects_or_error(Foundation, user_id=recipient_id, is_verified=True)
+        foundation = user_objects_or_error(
+            Foundation, user_id=recipient_id, is_verified=True
+        )
         if foundation is None:
             return error_response("Foundation not found or not verified.")
 
@@ -99,10 +101,14 @@ class PayZakat(APIView):
             amount=amount,
             note=f"Zakat to {foundation.organization_name}",
             counterparty=foundation.organization_name,
-            sender_message=(f"You paid ৳{amount} Zakat to {foundation.organization_name}."),
+            sender_message=(
+                f"You paid ৳{amount} Zakat to {foundation.organization_name}."
+            ),
         )
 
-        return Response(ZakatPaymentSerializer(payment).data, status=status.HTTP_201_CREATED)
+        return Response(
+            ZakatPaymentSerializer(payment).data, status=status.HTTP_201_CREATED
+        )
 
 
 class ZakatHistory(APIView):
@@ -123,7 +129,9 @@ class GiveSadaqah(APIView):
         amount = serializer.validated_data["amount"]
         recipient_id = serializer.validated_data["recipient_id"]
 
-        foundation = user_objects_or_error(Foundation, user_id=recipient_id, is_verified=True)
+        foundation = user_objects_or_error(
+            Foundation, user_id=recipient_id, is_verified=True
+        )
         if foundation is None:
             return error_response("Foundation not found or not verified.")
 
@@ -134,7 +142,9 @@ class GiveSadaqah(APIView):
         credit_wallet(foundation.user, amount)
 
         cause_key = serializer.validated_data.get("cause", "")
-        cause = CharityCause.objects.filter(key=cause_key).first() if cause_key else None
+        cause = (
+            CharityCause.objects.filter(key=cause_key).first() if cause_key else None
+        )
 
         donation = Sadaqah.objects.create(
             user=request.user,
@@ -151,10 +161,14 @@ class GiveSadaqah(APIView):
             amount=amount,
             note=f"Sadaqah to {foundation.organization_name}",
             counterparty=foundation.organization_name,
-            sender_message=(f"You gave ৳{amount} Sadaqah to {foundation.organization_name}."),
+            sender_message=(
+                f"You gave ৳{amount} Sadaqah to {foundation.organization_name}."
+            ),
         )
 
-        return Response(SadaqahSerializer(donation).data, status=status.HTTP_201_CREATED)
+        return Response(
+            SadaqahSerializer(donation).data, status=status.HTTP_201_CREATED
+        )
 
 
 class SadaqahHistory(APIView):
@@ -224,7 +238,9 @@ class SadaqahJariyahListCreate(APIView):
         amount = serializer.validated_data["amount"]
         recipient_id = serializer.validated_data["recipient_id"]
 
-        foundation = user_objects_or_error(Foundation, user_id=recipient_id, is_verified=True)
+        foundation = user_objects_or_error(
+            Foundation, user_id=recipient_id, is_verified=True
+        )
         if foundation is None:
             return error_response("Foundation not found or not verified.")
 
@@ -235,7 +251,9 @@ class SadaqahJariyahListCreate(APIView):
         credit_wallet(foundation.user, amount)
 
         cause_key = serializer.validated_data.get("cause", "")
-        cause = CharityCause.objects.filter(key=cause_key).first() if cause_key else None
+        cause = (
+            CharityCause.objects.filter(key=cause_key).first() if cause_key else None
+        )
 
         donation = SadaqahJariyah.objects.create(
             user=request.user,
@@ -259,20 +277,26 @@ class SadaqahJariyahListCreate(APIView):
             ),
         )
 
-        return Response(SadaqahJariyahSerializer(donation).data, status=status.HTTP_201_CREATED)
+        return Response(
+            SadaqahJariyahSerializer(donation).data, status=status.HTTP_201_CREATED
+        )
 
 
 class SadaqahJariyahDetail(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, donation_id):
-        donation = user_objects_or_error(SadaqahJariyah, id=donation_id, user=request.user)
+        donation = user_objects_or_error(
+            SadaqahJariyah, id=donation_id, user=request.user
+        )
         if donation is None:
             return error_response("Donation not found", status.HTTP_404_NOT_FOUND)
         return Response(SadaqahJariyahSerializer(donation).data)
 
     def patch(self, request, donation_id):
-        donation = user_objects_or_error(SadaqahJariyah, id=donation_id, user=request.user)
+        donation = user_objects_or_error(
+            SadaqahJariyah, id=donation_id, user=request.user
+        )
         if donation is None:
             return error_response("Donation not found", status.HTTP_404_NOT_FOUND)
 

@@ -5,7 +5,15 @@ from .models import Agent, AgentTransaction
 
 @admin.register(Agent)
 class AgentAdmin(admin.ModelAdmin):
-    list_display = ["shop_name", "full_name", "phone", "district", "thana", "is_verified", "status"]
+    list_display = [
+        "shop_name",
+        "full_name",
+        "phone",
+        "district",
+        "thana",
+        "is_verified",
+        "status",
+    ]
     list_filter = ["district", "status", "is_verified"]
     search_fields = ["shop_name", "full_name", "phone"]
 

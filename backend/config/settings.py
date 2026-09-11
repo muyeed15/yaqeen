@@ -113,7 +113,9 @@ DATABASES = {
 }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -167,8 +169,12 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=int(required_env("ACCESS_TOKEN_MINUTES"))),
-    "REFRESH_TOKEN_LIFETIME": timedelta(minutes=int(required_env("REFRESH_TOKEN_MINUTES"))),
+    "ACCESS_TOKEN_LIFETIME": timedelta(
+        minutes=int(required_env("ACCESS_TOKEN_MINUTES"))
+    ),
+    "REFRESH_TOKEN_LIFETIME": timedelta(
+        minutes=int(required_env("REFRESH_TOKEN_MINUTES"))
+    ),
 }
 
 TRANSFER_FEE_PERCENT = float(required_env("TRANSFER_FEE_PERCENT"))

@@ -16,8 +16,12 @@ class Agent(models.Model):
     district = models.CharField(max_length=50)
     thana = models.CharField(max_length=50)
     address = models.TextField()
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    latitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True
+    )
+    longitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True
+    )
     is_verified = models.BooleanField(default=False)
     commission_pct = models.DecimalField(
         max_digits=5,
@@ -59,7 +63,9 @@ class AgentTransaction(models.Model):
         on_delete=models.CASCADE,
         related_name="agent_transactions",
     )
-    agent = models.ForeignKey(Agent, on_delete=models.PROTECT, related_name="transactions")
+    agent = models.ForeignKey(
+        Agent, on_delete=models.PROTECT, related_name="transactions"
+    )
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     fee = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     commission = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)

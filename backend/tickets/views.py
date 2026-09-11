@@ -60,7 +60,9 @@ class TicketProviderListView(APIView):
         )
         if category:
             qs = qs.filter(category__key=category)
-        return Response(TicketProviderSerializer(qs, many=True, context={"request": request}).data)
+        return Response(
+            TicketProviderSerializer(qs, many=True, context={"request": request}).data
+        )
 
 
 class TicketTripsView(APIView):
@@ -151,7 +153,9 @@ class BookTicketView(APIView):
             amount,
             booking.booking_reference,
         )
-        return Response(TicketBookingSerializer(booking).data, status=status.HTTP_201_CREATED)
+        return Response(
+            TicketBookingSerializer(booking).data, status=status.HTTP_201_CREATED
+        )
 
 
 class TicketHistoryView(APIView):
@@ -201,7 +205,7 @@ class CancelTicketView(APIView):
             note=f"Refund for booking {booking.booking_reference}",
             counterparty=booking.provider.name,
             receiver_message=(
-                f"Refund of ৳{refund} credited for booking " f"{booking.booking_reference}."
+                f"Refund of ৳{refund} credited for booking {booking.booking_reference}."
             ),
         )
 

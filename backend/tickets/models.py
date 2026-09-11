@@ -52,12 +52,20 @@ class TicketBooking(models.Model):
         on_delete=models.CASCADE,
         related_name="ticket_bookings",
     )
-    provider = models.ForeignKey(TicketProvider, on_delete=models.PROTECT, related_name="bookings")
+    provider = models.ForeignKey(
+        TicketProvider, on_delete=models.PROTECT, related_name="bookings"
+    )
     booking_reference = models.CharField(max_length=30, unique=True, editable=False)
     journey_date = models.DateField()
-    departure_time = models.CharField(max_length=10, blank=True, help_text="e.g. 08:30 AM")
-    origin = models.CharField(max_length=100, blank=True, help_text="Origin city/station")
-    destination = models.CharField(max_length=100, blank=True, help_text="Destination city/station")
+    departure_time = models.CharField(
+        max_length=10, blank=True, help_text="e.g. 08:30 AM"
+    )
+    origin = models.CharField(
+        max_length=100, blank=True, help_text="Origin city/station"
+    )
+    destination = models.CharField(
+        max_length=100, blank=True, help_text="Destination city/station"
+    )
     trip_name = models.CharField(
         max_length=150,
         blank=True,
@@ -68,8 +76,12 @@ class TicketBooking(models.Model):
         blank=True,
         help_text="AC/Non-AC, Shovon/First Class, Economy/Business, Regular/Premium",
     )
-    coach = models.CharField(max_length=20, blank=True, help_text="Coach/bogi number or name")
-    seat_number = models.CharField(max_length=50, blank=True, help_text="e.g. A1, B3-B5")
+    coach = models.CharField(
+        max_length=20, blank=True, help_text="Coach/bogi number or name"
+    )
+    seat_number = models.CharField(
+        max_length=50, blank=True, help_text="e.g. A1, B3-B5"
+    )
     passengers = models.PositiveSmallIntegerField(default=1)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     fee = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
@@ -94,13 +106,18 @@ class TicketBooking(models.Model):
 
 
 class TicketTrip(models.Model):
-    provider = models.ForeignKey(TicketProvider, on_delete=models.CASCADE, related_name="trips")
+    provider = models.ForeignKey(
+        TicketProvider, on_delete=models.CASCADE, related_name="trips"
+    )
     name = models.CharField(
-        max_length=150, help_text="Bus name, train number, movie title, flight number, event name"
+        max_length=150,
+        help_text="Bus name, train number, movie title, flight number, event name",
     )
     origin = models.CharField(max_length=100, blank=True)
     destination = models.CharField(max_length=100, blank=True)
-    departure_time = models.CharField(max_length=10, blank=True, help_text="e.g. 08:00 AM")
+    departure_time = models.CharField(
+        max_length=10, blank=True, help_text="e.g. 08:00 AM"
+    )
     arrival_time = models.CharField(max_length=10, blank=True)
     coach_class = models.CharField(max_length=50, blank=True)
     coaches = models.JSONField(

@@ -50,4 +50,6 @@ class Merchant(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.business_name} ({self.category.label if self.category_id else ''})"
+        return (
+            f"{self.business_name} ({self.category.label if self.category_id else ''})"
+        )

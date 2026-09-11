@@ -157,7 +157,9 @@ class MerchantPayViewTest(TestCase):
             },
         )
         self.assertEqual(Notification.objects.filter(user=self.payer).count(), 1)
-        self.assertEqual(Notification.objects.filter(user=self.merchant_user).count(), 1)
+        self.assertEqual(
+            Notification.objects.filter(user=self.merchant_user).count(), 1
+        )
 
     def test_transaction_record_created(self):
         self.client.post(

@@ -10,7 +10,15 @@ class OperatorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Operator
-        fields = ["id", "name", "operator_code", "logo", "type", "type_label", "is_active"]
+        fields = [
+            "id",
+            "name",
+            "operator_code",
+            "logo",
+            "type",
+            "type_label",
+            "is_active",
+        ]
 
     def get_logo(self, obj):
         if not obj.logo:
@@ -46,7 +54,11 @@ class RechargeSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=15)
     amount = serializers.DecimalField(max_digits=8, decimal_places=2, required=False)
     recharge_type = serializers.ChoiceField(
-        choices=[("prepaid", "Prepaid"), ("postpaid", "Postpaid"), ("data_pack", "Data Pack")]
+        choices=[
+            ("prepaid", "Prepaid"),
+            ("postpaid", "Postpaid"),
+            ("data_pack", "Data Pack"),
+        ]
     )
     data_pack_id = serializers.IntegerField(required=False)
 
@@ -67,7 +79,9 @@ class RechargeSerializer(serializers.Serializer):
         if data["recharge_type"] in ("prepaid", "postpaid") and not data.get("amount"):
             raise serializers.ValidationError({"amount": "Amount is required."})
         if data["recharge_type"] == "data_pack" and not data.get("data_pack_id"):
-            raise serializers.ValidationError({"data_pack_id": "Data pack is required."})
+            raise serializers.ValidationError(
+                {"data_pack_id": "Data pack is required."}
+            )
         return data
 
 

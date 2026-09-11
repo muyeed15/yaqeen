@@ -43,9 +43,7 @@ class PointsTransaction(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return (
-            f"{self.user.phone} {'+' if self.transaction_type == 'earn' else '-'}{self.points}pts"
-        )
+        return f"{self.user.phone} {'+' if self.transaction_type == 'earn' else '-'}{self.points}pts"
 
 
 class Offer(models.Model):

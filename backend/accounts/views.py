@@ -8,7 +8,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.models import CharityCause, Foundation, KYCVerification, Nominee, User, Wallet
+from accounts.models import (
+    CharityCause,
+    Foundation,
+    KYCVerification,
+    Nominee,
+    User,
+    Wallet,
+)
 from accounts.serializers import (
     FoundationSerializer,
     KYCVerificationSerializer,
@@ -50,7 +57,9 @@ class NomineeListCreateView(APIView):
         serializer = NomineeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         if serializer.validated_data.get("is_primary"):
-            Nominee.objects.filter(user=request.user, is_primary=True).update(is_primary=False)
+            Nominee.objects.filter(user=request.user, is_primary=True).update(
+                is_primary=False
+            )
         nominee = serializer.save(user=request.user)
         return Response(NomineeSerializer(nominee).data, status=status.HTTP_201_CREATED)
 
@@ -116,7 +125,9 @@ class PhoneLookupView(APIView):
             user = User.objects.get(phone=phone, is_active=True)
         except User.DoesNotExist:
             try:
-                agent = Agent.objects.get(phone=phone, is_verified=True, status="active")
+                agent = Agent.objects.get(
+                    phone=phone, is_verified=True, status="active"
+                )
             except Agent.DoesNotExist:
                 return error_response("No account found with this phone number.", 404)
             return Response(
@@ -135,7 +146,9 @@ class PhoneLookupView(APIView):
             {
                 "phone": user.phone,
                 "full_name": user.full_name,
-                "name": merchant.business_name if is_verified_merchant else user.full_name,
+                "name": merchant.business_name
+                if is_verified_merchant
+                else user.full_name,
                 "type": "merchant" if is_verified_merchant else "user",
                 "is_verified_merchant": is_verified_merchant,
             }
@@ -147,10 +160,14 @@ class FoundationListView(APIView):
 
     def get(self, request):
         cause = request.query_params.get("cause")
-        foundations = Foundation.objects.filter(is_verified=True).select_related("user", "cause")
+        foundations = Foundation.objects.filter(is_verified=True).select_related(
+            "user", "cause"
+        )
         if cause:
             foundations = foundations.filter(cause__key=cause)
-        serializer = FoundationSerializer(foundations, many=True, context={"request": request})
+        serializer = FoundationSerializer(
+            foundations, many=True, context={"request": request}
+        )
         return Response(serializer.data)
 
 
@@ -186,4 +203,6 @@ class FoundationDetailView(APIView):
             )
         except Foundation.DoesNotExist:
             return error_response("Foundation not found.", 404)
-        return Response(FoundationSerializer(foundation, context={"request": request}).data)
+        return Response(
+            FoundationSerializer(foundation, context={"request": request}).data
+        )

@@ -72,7 +72,9 @@ class CashInView(APIView):
         except Agent.DoesNotExist:
             return error_response("Agent not found or inactive.")
 
-        commission = (amount * agent.commission_pct / Decimal("100")).quantize(Decimal("0.01"))
+        commission = (amount * agent.commission_pct / Decimal("100")).quantize(
+            Decimal("0.01")
+        )
         ref = "CIN" + uuid.uuid4().hex[:10].upper()
 
         credit_wallet(request.user, amount)
@@ -97,7 +99,8 @@ class CashInView(APIView):
             note=f"Agent cash in at {agent_name}",
             counterparty=agent_name,
             receiver_message=(
-                f"You cashed in ৳{amount} via {agent.full_name} at {agent_name}. " f"Ref: {ref}"
+                f"You cashed in ৳{amount} via {agent.full_name} at {agent_name}. "
+                f"Ref: {ref}"
             ),
         )
 
@@ -108,7 +111,9 @@ class CashInView(APIView):
             amount,
             ref,
         )
-        return Response(AgentTransactionSerializer(txn).data, status=status.HTTP_201_CREATED)
+        return Response(
+            AgentTransactionSerializer(txn).data, status=status.HTTP_201_CREATED
+        )
 
 
 class CashOutView(APIView):
@@ -128,7 +133,9 @@ class CashOutView(APIView):
             return error_response("Agent not found or inactive.")
 
         fee = (amount * Decimal("1.8") / Decimal("100")).quantize(Decimal("0.01"))
-        commission = (amount * agent.commission_pct / Decimal("100")).quantize(Decimal("0.01"))
+        commission = (amount * agent.commission_pct / Decimal("100")).quantize(
+            Decimal("0.01")
+        )
         total = amount + fee
 
         wallet = locked_deduct_wallet(request.user, total)
@@ -169,7 +176,9 @@ class CashOutView(APIView):
             fee,
             ref,
         )
-        return Response(AgentTransactionSerializer(txn).data, status=status.HTTP_201_CREATED)
+        return Response(
+            AgentTransactionSerializer(txn).data, status=status.HTTP_201_CREATED
+        )
 
 
 class AgentTransactionHistoryView(APIView):

@@ -120,8 +120,12 @@ class KYCVerification(models.Model):
         ("rejected", "Rejected"),
     ]
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="kyc_verification")
-    document_type = models.CharField(max_length=20, choices=DOC_TYPE_CHOICES, default="nid")
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="kyc_verification"
+    )
+    document_type = models.CharField(
+        max_length=20, choices=DOC_TYPE_CHOICES, default="nid"
+    )
     document_number = models.CharField(max_length=30)
     date_of_birth = models.DateField(null=True, blank=True)
     address = models.TextField(blank=True)
@@ -140,7 +144,9 @@ class KYCVerification(models.Model):
 
 
 class OTPVerification(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="otp_verifications")
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="otp_verifications"
+    )
     otp = models.CharField(max_length=6)
     purpose = models.CharField(max_length=20, default="2fa")
     is_used = models.BooleanField(default=False)
@@ -173,7 +179,9 @@ class CharityCause(models.Model):
 
 
 class Foundation(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="foundation_profile")
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="foundation_profile"
+    )
     organization_name = models.CharField(max_length=200)
     registration_number = models.CharField(max_length=50, unique=True)
     cause = models.ForeignKey(

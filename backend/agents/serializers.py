@@ -30,7 +30,9 @@ class AgentSerializer(serializers.ModelSerializer):
 class CashInOutSerializer(serializers.Serializer):
     agent_id = serializers.IntegerField()
     amount = serializers.DecimalField(max_digits=12, decimal_places=2)
-    otp = serializers.CharField(max_length=6, required=False, allow_blank=True, default="")
+    otp = serializers.CharField(
+        max_length=6, required=False, allow_blank=True, default=""
+    )
 
     def validate_amount(self, value):
         if value <= 0:

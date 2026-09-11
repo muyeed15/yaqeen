@@ -46,7 +46,9 @@ class BillerListView(APIView):
         qs = Biller.objects.filter(is_active=True).select_related("category")
         if category:
             qs = qs.filter(category__key=category)
-        return Response(BillerSerializer(qs, many=True, context={"request": request}).data)
+        return Response(
+            BillerSerializer(qs, many=True, context={"request": request}).data
+        )
 
 
 class PayBillView(APIView):
@@ -89,7 +91,8 @@ class PayBillView(APIView):
             note=f"{biller.name} bill {payment.bill_month}".strip(),
             counterparty=biller.name,
             sender_message=(
-                f"You paid ৳{amount} to {biller.name} for account " f"{account_number}. Ref: {ref}"
+                f"You paid ৳{amount} to {biller.name} for account "
+                f"{account_number}. Ref: {ref}"
             ),
         )
 
@@ -101,7 +104,9 @@ class PayBillView(APIView):
             amount,
             ref,
         )
-        return Response(BillPaymentSerializer(payment).data, status=status.HTTP_201_CREATED)
+        return Response(
+            BillPaymentSerializer(payment).data, status=status.HTTP_201_CREATED
+        )
 
 
 class BillHistoryView(APIView):

@@ -5,7 +5,13 @@ from .models import MudarabahAccount, MudarabahContribution, MudarabahPlan
 
 @admin.register(MudarabahPlan)
 class MudarabahPlanAdmin(admin.ModelAdmin):
-    list_display = ["name", "monthly_amount", "duration_months", "profit_ratio", "is_active"]
+    list_display = [
+        "name",
+        "monthly_amount",
+        "duration_months",
+        "profit_ratio",
+        "is_active",
+    ]
     list_filter = ["is_active"]
     search_fields = ["name"]
 

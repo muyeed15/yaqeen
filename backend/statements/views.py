@@ -21,7 +21,9 @@ class StatementListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        qs = AccountStatement.objects.filter(user=request.user).order_by("-year", "-month")
+        qs = AccountStatement.objects.filter(user=request.user).order_by(
+            "-year", "-month"
+        )
         p = paginate(qs, get_page(request), get_page_size(request))
         return Response(
             {
@@ -80,4 +82,6 @@ class GenerateStatementView(APIView):
             transaction_count=txns.count(),
         )
 
-        return Response(StatementSerializer(statement).data, status=status.HTTP_201_CREATED)
+        return Response(
+            StatementSerializer(statement).data, status=status.HTTP_201_CREATED
+        )

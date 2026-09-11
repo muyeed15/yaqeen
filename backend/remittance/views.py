@@ -65,7 +65,8 @@ class ReceiveRemittanceView(APIView):
             amount=amount_bdt,
             fee=Decimal("0.00"),
             note=(
-                f"Remittance from {txn.sender_name} ({txn.sender_country}) " f"via {partner.name}"
+                f"Remittance from {txn.sender_name} ({txn.sender_country}) "
+                f"via {partner.name}"
             ),
             counterparty=partner.name,
             receiver_message=(
@@ -83,7 +84,9 @@ class ReceiveRemittanceView(APIView):
             amount_bdt,
             txn.reference_number,
         )
-        return Response(RemittanceTransactionSerializer(txn).data, status=status.HTTP_201_CREATED)
+        return Response(
+            RemittanceTransactionSerializer(txn).data, status=status.HTTP_201_CREATED
+        )
 
 
 class RemittanceHistoryView(APIView):
@@ -101,6 +104,8 @@ class RemittanceHistoryView(APIView):
                 "count": p["count"],
                 "total_pages": p["total_pages"],
                 "page": p["page"],
-                "results": RemittanceTransactionSerializer(p["queryset"], many=True).data,
+                "results": RemittanceTransactionSerializer(
+                    p["queryset"], many=True
+                ).data,
             }
         )

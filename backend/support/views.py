@@ -22,7 +22,8 @@ class SupportCategoryListView(APIView):
 
     def get(self, request):
         categories = [
-            {"key": c.key, "label": c.label} for c in SupportCategory.objects.filter(is_active=True)
+            {"key": c.key, "label": c.label}
+            for c in SupportCategory.objects.filter(is_active=True)
         ]
         return Response(categories)
 
@@ -45,7 +46,9 @@ class TicketListCreateView(APIView):
 
         category_key = serializer.validated_data.get("category", "")
         category = (
-            SupportCategory.objects.filter(key=category_key).first() if category_key else None
+            SupportCategory.objects.filter(key=category_key).first()
+            if category_key
+            else None
         )
 
         ticket = SupportTicket.objects.create(
@@ -60,8 +63,12 @@ class TicketListCreateView(APIView):
             message=serializer.validated_data["message"],
         )
 
-        logger.info("New ticket: user=%s subject=%s", request.user.phone, ticket.subject)
-        return Response(SupportTicketSerializer(ticket).data, status=status.HTTP_201_CREATED)
+        logger.info(
+            "New ticket: user=%s subject=%s", request.user.phone, ticket.subject
+        )
+        return Response(
+            SupportTicketSerializer(ticket).data, status=status.HTTP_201_CREATED
+        )
 
 
 class TicketDetailView(APIView):

@@ -25,5 +25,9 @@ urlpatterns = [
         MudarabahContributionHistory.as_view(),
         name="mudarabah-contribution-history",
     ),
-    path("mudarabah/pay/", PayMudarabahContribution.as_view(), name="mudarabah-pay-contribution"),
+    path(
+        "mudarabah/pay/",
+        PayMudarabahContribution.as_view(),
+        name="mudarabah-pay-contribution",
+    ),
 ]

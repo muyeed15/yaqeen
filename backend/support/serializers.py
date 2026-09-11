@@ -8,7 +8,14 @@ class TicketMessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TicketMessage
-        fields = ["id", "sender", "sender_phone", "message", "is_staff_reply", "created_at"]
+        fields = [
+            "id",
+            "sender",
+            "sender_phone",
+            "message",
+            "is_staff_reply",
+            "created_at",
+        ]
 
 
 class SupportTicketSerializer(serializers.ModelSerializer):

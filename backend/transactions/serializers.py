@@ -5,8 +5,12 @@ from transactions.models import MoneyRequest, Transaction
 
 
 class TransactionSerializer(serializers.ModelSerializer):
-    sender_phone = serializers.CharField(source="sender.phone", read_only=True, allow_null=True)
-    receiver_phone = serializers.CharField(source="receiver.phone", read_only=True, allow_null=True)
+    sender_phone = serializers.CharField(
+        source="sender.phone", read_only=True, allow_null=True
+    )
+    receiver_phone = serializers.CharField(
+        source="receiver.phone", read_only=True, allow_null=True
+    )
     merchant_name = serializers.CharField(
         source="merchant.business_name", read_only=True, allow_null=True
     )
@@ -42,7 +46,9 @@ class TransferSerializer(serializers.Serializer):
 
     def validate_receiver_phone(self, value):
         if not User.objects.filter(phone=value).exists():
-            raise serializers.ValidationError("No account found with this phone number.")
+            raise serializers.ValidationError(
+                "No account found with this phone number."
+            )
         return value
 
 
@@ -78,5 +84,7 @@ class CreateMoneyRequestSerializer(serializers.Serializer):
 
     def validate_phone(self, value):
         if not User.objects.filter(phone=value).exists():
-            raise serializers.ValidationError("No account found with this phone number.")
+            raise serializers.ValidationError(
+                "No account found with this phone number."
+            )
         return value

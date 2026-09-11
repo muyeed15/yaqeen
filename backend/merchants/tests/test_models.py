@@ -42,7 +42,9 @@ class MerchantModelTest(TestCase):
         self.assertEqual(qs.first().business_name, "A Store")
 
     def test_all_categories_valid(self):
-        for i, key in enumerate(["retail", "food", "transport", "utility", "health", "education"]):
+        for i, key in enumerate(
+            ["retail", "food", "transport", "utility", "health", "education"]
+        ):
             phone = f"0170000{100 + i:0>4}"
             nid = str(1000000000 + i)
             m = Merchant.objects.create(

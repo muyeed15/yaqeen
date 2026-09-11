@@ -8,7 +8,9 @@ from django.utils import timezone
 
 class ZakatPayment(models.Model):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="zakat_payments"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="zakat_payments",
     )
     recipient = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -20,7 +22,10 @@ class ZakatPayment(models.Model):
     )
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     asset_type = models.CharField(
-        max_length=50, blank=True, null=True, help_text="e.g., cash, gold, silver, business"
+        max_length=50,
+        blank=True,
+        null=True,
+        help_text="e.g., cash, gold, silver, business",
     )
     hawl_year = models.PositiveIntegerField(
         blank=True, null=True, help_text="The lunar year this zakat covers"
@@ -40,7 +45,9 @@ class ZakatPayment(models.Model):
 
 class Sadaqah(models.Model):
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="sadaqah_donations"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="sadaqah_donations",
     )
     recipient = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -78,10 +85,14 @@ class HawlTracking(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="hawl_tracking"
     )
     nisab_crossed_at = models.DateTimeField(
-        blank=True, null=True, help_text="When the user's wealth first crossed the nisab threshold"
+        blank=True,
+        null=True,
+        help_text="When the user's wealth first crossed the nisab threshold",
     )
     next_hawl_date = models.DateField(
-        blank=True, null=True, help_text="One lunar year after nisab_crossed_at; zakat becomes due"
+        blank=True,
+        null=True,
+        help_text="One lunar year after nisab_crossed_at; zakat becomes due",
     )
     is_eligible = models.BooleanField(
         default=False, help_text="Whether the user currently has wealth above nisab"
@@ -103,7 +114,9 @@ class SadaqahJariyah(models.Model):
     ]
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="sadaqah_jariyah_donations"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="sadaqah_jariyah_donations",
     )
     recipient = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -122,11 +135,15 @@ class SadaqahJariyah(models.Model):
         related_name="sadaqah_jariyah_donations",
         help_text="Recurring cause (e.g., water well, education fund)",
     )
-    frequency = models.CharField(max_length=10, choices=FREQUENCY_CHOICES, default="monthly")
+    frequency = models.CharField(
+        max_length=10, choices=FREQUENCY_CHOICES, default="monthly"
+    )
     is_active = models.BooleanField(default=True)
     start_date = models.DateField(default=timezone.localdate)
     next_due_date = models.DateField(blank=True, null=True)
-    total_donated = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal("0.00"))
+    total_donated = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal("0.00")
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

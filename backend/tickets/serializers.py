@@ -29,7 +29,15 @@ class TicketProviderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TicketProvider
-        fields = ["id", "name", "category", "category_label", "logo", "is_active", "trips"]
+        fields = [
+            "id",
+            "name",
+            "category",
+            "category_label",
+            "logo",
+            "is_active",
+            "trips",
+        ]
 
     def get_logo(self, obj):
         if not obj.logo:
@@ -45,7 +53,9 @@ class TicketProviderSerializer(serializers.ModelSerializer):
 
 class TicketBookingSerializer(serializers.ModelSerializer):
     provider_name = serializers.CharField(source="provider.name", read_only=True)
-    provider_category = serializers.CharField(source="provider.category", read_only=True)
+    provider_category = serializers.CharField(
+        source="provider.category", read_only=True
+    )
 
     class Meta:
         model = TicketBooking

@@ -39,7 +39,9 @@ class PayBillSerializer(serializers.Serializer):
     account_number = serializers.CharField(max_length=50)
     bill_number = serializers.CharField(max_length=50)
     amount = serializers.DecimalField(max_digits=10, decimal_places=2)
-    bill_month = serializers.CharField(max_length=10, required=False, allow_blank=True, default="")
+    bill_month = serializers.CharField(
+        max_length=10, required=False, allow_blank=True, default=""
+    )
 
     def validate_amount(self, value):
         if value <= 0:

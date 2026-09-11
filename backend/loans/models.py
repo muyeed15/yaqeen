@@ -49,9 +49,13 @@ class QardHasanApplication(models.Model):
     )
     loan_reference = models.CharField(max_length=20, unique=True, editable=False)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    service_fee = models.DecimalField(max_digits=8, decimal_places=2, default=Decimal("0.00"))
+    service_fee = models.DecimalField(
+        max_digits=8, decimal_places=2, default=Decimal("0.00")
+    )
     amount_due = models.DecimalField(max_digits=10, decimal_places=2)
-    amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
+    amount_paid = models.DecimalField(
+        max_digits=10, decimal_places=2, default=Decimal("0.00")
+    )
     hibah_given = models.DecimalField(
         max_digits=8,
         decimal_places=2,

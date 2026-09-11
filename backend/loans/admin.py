@@ -5,7 +5,14 @@ from .models import QardHasanApplication, QardHasanProduct, QardHasanRepayment
 
 @admin.register(QardHasanProduct)
 class QardHasanProductAdmin(admin.ModelAdmin):
-    list_display = ["name", "min_amount", "max_amount", "tenure_days", "service_fee", "is_active"]
+    list_display = [
+        "name",
+        "min_amount",
+        "max_amount",
+        "tenure_days",
+        "service_fee",
+        "is_active",
+    ]
     list_filter = ["is_active"]
 
 
