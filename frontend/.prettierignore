@@ -1,0 +1,10 @@
+.next
+node_modules
+logs
+certificates
+public
+package-lock.json
+next-env.d.ts
+*.md
+.env
+.env.*

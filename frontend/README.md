@@ -47,6 +47,8 @@ PAGE_SIZE=10
 | `npm run build` | Create and validate the production bundle |
 | `npm start` | Start the built custom production server |
 | `npm run lint` | Run ESLint |
+| `npm run format` | Format the codebase with Prettier |
+| `npm run format:check` | Check formatting without writing changes |
 | `npm test` | Run Vitest once |
 | `npm run test:watch` | Run Vitest in watch mode |
 
@@ -142,6 +144,7 @@ Browser logging uses the configured public log level but does not write server l
 
 ```bash
 npm run lint
+npm run format:check
 npm test
 npx tsc --noEmit
 npx knip --no-progress
