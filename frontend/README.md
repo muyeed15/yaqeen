@@ -31,6 +31,7 @@ PORT=3003
 HOST=127.0.0.1
 USE_HTTPS=false
 
+# Server-side URL of the Django API (the BACKEND).
 DJANGO_API_URL=http://127.0.0.1:8003
 ACCESS_TOKEN_MINUTES=1440
 REFRESH_TOKEN_MINUTES=43200
@@ -39,6 +40,8 @@ NEXT_PUBLIC_LOG_LEVEL=info
 PAGE_SIZE=10
 ```
 
+The frontend is served at the frontend origin, and `DJANGO_API_URL` points at the backend (the
+public backend origin, or the internal `http://127.0.0.1:8003` when co-located behind the proxy).
 `ACCESS_TOKEN_MINUTES` and `REFRESH_TOKEN_MINUTES` must match the backend. `NEXT_PUBLIC_LOG_LEVEL`
 accepts `debug`, `info`, `warn`, or `error`.
 

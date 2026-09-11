@@ -39,8 +39,14 @@ environment does not need to be activated before starting PM2. See the
 ```
 SECRET_KEY=django-insecure-changeme
 DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-CORS_ALLOWED_ORIGINS=https://wallet.example.com
+
+# BACKEND host, without a scheme.
+ALLOWED_HOSTS=backend.example.com,localhost,127.0.0.1
+# FRONTEND origin, with a scheme.
+CORS_ALLOWED_ORIGINS=https://frontend.example.com
+# BACKEND origin, with a scheme. Used for forms and the Django admin.
+CSRF_TRUSTED_ORIGINS=https://backend.example.com
+
 SECURE_SSL_REDIRECT=True
 SECURE_HSTS_SECONDS=31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS=False
@@ -63,6 +69,10 @@ TRANSFER_FEE_PERCENT=1.5
 PAGE_SIZE=10
 PAGE_SIZE_MAX=50
 ```
+
+`ALLOWED_HOSTS` takes the backend host, `CORS_ALLOWED_ORIGINS` takes the frontend origin, and
+`CSRF_TRUSTED_ORIGINS` takes the backend origin. Host entries have no scheme; origins keep
+`https://`.
 
 ## Project Structure
 
