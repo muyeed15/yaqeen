@@ -9,12 +9,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.pagination import get_page, get_page_size, paginate
-from common.utils import error_response, locked_deduct_wallet
+from common.utils import error_response, locked_deduct_wallet, record_transaction
 
-from .models import Operator, DataPack, RechargeTransaction
+from .models import DataPack, Operator, RechargeTransaction
 from .serializers import (
-    OperatorSerializer, DataPackSerializer,
-    RechargeSerializer, RechargeTransactionSerializer,
+    DataPackSerializer,
+    OperatorSerializer,
+    RechargeSerializer,
+    RechargeTransactionSerializer,
 )
 
 logger = logging.getLogger("recharge")
@@ -25,11 +27,7 @@ class OperatorListView(APIView):
 
     def get(self, request):
         operators = Operator.objects.filter(is_active=True)
-        return Response(
-            OperatorSerializer(
-                operators, many=True, context={"request": request}
-            ).data
-        )
+        return Response(OperatorSerializer(operators, many=True, context={"request": request}).data)
 
 
 class DataPackListView(APIView):
@@ -90,26 +88,45 @@ class RechargeView(APIView):
             status="completed",
         )
 
+        record_transaction(
+            sender=request.user,
+            transaction_type="recharge",
+            amount=amount,
+            fee=fee,
+            note=f"{operator.name} {recharge_type.replace('_', ' ')} for {phone_number}",
+            counterparty=operator.name,
+            sender_message=(
+                f"You recharged ৳{amount} for {phone_number} on {operator.name}. " f"Ref: {ref}"
+            ),
+        )
+
         logger.info(
             "Recharge: user=%s op=%s phone=%s type=%s amount=%s ref=%s",
-            request.user.phone, operator.name, phone_number, recharge_type, amount, ref,
+            request.user.phone,
+            operator.name,
+            phone_number,
+            recharge_type,
+            amount,
+            ref,
         )
-        return Response(
-            RechargeTransactionSerializer(txn).data, status=status.HTTP_201_CREATED
-        )
+        return Response(RechargeTransactionSerializer(txn).data, status=status.HTTP_201_CREATED)
 
 
 class RechargeHistoryView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        qs = RechargeTransaction.objects.filter(
-            user=request.user
-        ).select_related("operator").order_by("-created_at")
+        qs = (
+            RechargeTransaction.objects.filter(user=request.user)
+            .select_related("operator")
+            .order_by("-created_at")
+        )
         p = paginate(qs, get_page(request), get_page_size(request))
-        return Response({
-            "count": p["count"],
-            "total_pages": p["total_pages"],
-            "page": p["page"],
-            "results": RechargeTransactionSerializer(p["queryset"], many=True).data,
-        })
+        return Response(
+            {
+                "count": p["count"],
+                "total_pages": p["total_pages"],
+                "page": p["page"],
+                "results": RechargeTransactionSerializer(p["queryset"], many=True).data,
+            }
+        )

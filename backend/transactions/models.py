@@ -10,6 +10,15 @@ class Transaction(models.Model):
         ("cash_in", "Cash In"),
         ("cash_out", "Cash Out"),
         ("payment", "QR Payment"),
+        ("bill", "Bill Payment"),
+        ("recharge", "Mobile Recharge"),
+        ("bank", "Bank Transfer"),
+        ("savings", "Savings"),
+        ("charity", "Charity"),
+        ("loan", "Qard Hasan"),
+        ("ticket", "Ticket Booking"),
+        ("remittance", "Remittance"),
+        ("gateway", "Gateway Payment"),
     ]
 
     STATUS_CHOICES = [
@@ -41,6 +50,7 @@ class Transaction(models.Model):
         blank=True,
         related_name="received_payments",
     )
+    counterparty = models.CharField(max_length=150, blank=True, default="")
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     fee = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     transaction_type = models.CharField(max_length=10, choices=TYPE_CHOICES)

@@ -8,12 +8,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.pagination import get_page, get_page_size, paginate
-from common.utils import credit_wallet, error_response
+from common.utils import credit_wallet, error_response, record_transaction
 
 from .models import RemittancePartner, RemittanceTransaction
 from .serializers import (
-    RemittancePartnerSerializer, RemittanceTransactionSerializer,
     ReceiveRemittanceSerializer,
+    RemittancePartnerSerializer,
+    RemittanceTransactionSerializer,
 )
 
 logger = logging.getLogger("remittance")
@@ -58,27 +59,48 @@ class ReceiveRemittanceView(APIView):
             status="completed",
         )
 
+        record_transaction(
+            receiver=request.user,
+            transaction_type="remittance",
+            amount=amount_bdt,
+            fee=Decimal("0.00"),
+            note=(
+                f"Remittance from {txn.sender_name} ({txn.sender_country}) " f"via {partner.name}"
+            ),
+            counterparty=partner.name,
+            receiver_message=(
+                f"You received ৳{amount_bdt} from {txn.sender_name} via "
+                f"{partner.name}. Ref: {txn.reference_number}"
+            ),
+        )
+
         logger.info(
             "Remittance: user=%s partner=%s foreign=%s %s bdt=%s ref=%s",
-            request.user.phone, partner.name, amount_foreign,
-            partner.currency, amount_bdt, txn.reference_number,
+            request.user.phone,
+            partner.name,
+            amount_foreign,
+            partner.currency,
+            amount_bdt,
+            txn.reference_number,
         )
-        return Response(
-            RemittanceTransactionSerializer(txn).data, status=status.HTTP_201_CREATED
-        )
+        return Response(RemittanceTransactionSerializer(txn).data, status=status.HTTP_201_CREATED)
 
 
 class RemittanceHistoryView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        qs = RemittanceTransaction.objects.filter(
-            user=request.user
-        ).select_related("partner").order_by("-created_at")
+        qs = (
+            RemittanceTransaction.objects.filter(user=request.user)
+            .select_related("partner")
+            .order_by("-created_at")
+        )
         p = paginate(qs, get_page(request), get_page_size(request))
-        return Response({
-            "count": p["count"],
-            "total_pages": p["total_pages"],
-            "page": p["page"],
-            "results": RemittanceTransactionSerializer(p["queryset"], many=True).data,
-        })
+        return Response(
+            {
+                "count": p["count"],
+                "total_pages": p["total_pages"],
+                "page": p["page"],
+                "results": RemittanceTransactionSerializer(p["queryset"], many=True).data,
+            }
+        )

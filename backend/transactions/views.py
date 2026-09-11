@@ -15,10 +15,12 @@ from accounts.models import User, Wallet
 from common.pagination import get_page, get_page_size, paginate
 from common.utils import daily_spent, error_response
 from notifications.models import Notification
-from transactions.models import Transaction, MoneyRequest
+from transactions.models import MoneyRequest, Transaction
 from transactions.serializers import (
-    TransactionSerializer, TransferSerializer,
-    MoneyRequestSerializer, CreateMoneyRequestSerializer,
+    CreateMoneyRequestSerializer,
+    MoneyRequestSerializer,
+    TransactionSerializer,
+    TransferSerializer,
 )
 
 logger = logging.getLogger("transactions")
@@ -34,6 +36,7 @@ def _transaction_qs(user):
             "sender__phone",
             "receiver__phone",
             "merchant__business_name",
+            "counterparty",
             "amount",
             "fee",
             "transaction_type",
@@ -49,9 +52,7 @@ class TransactionListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        p = paginate(
-            _transaction_qs(request.user), get_page(request), get_page_size(request)
-        )
+        p = paginate(_transaction_qs(request.user), get_page(request), get_page_size(request))
         return Response(
             {
                 "count": p["count"],
@@ -93,9 +94,7 @@ class TransferView(APIView):
 
         try:
             with transaction.atomic():
-                sender_wallet = Wallet.objects.select_for_update().get(
-                    user=request.user
-                )
+                sender_wallet = Wallet.objects.select_for_update().get(user=request.user)
                 try:
                     receiver_wallet = (
                         Wallet.objects.select_for_update()
@@ -118,12 +117,8 @@ class TransferView(APIView):
                 today = timezone.now().date()
                 spent_today = daily_spent(request.user, today)
                 if spent_today + total_debit > sender_wallet.daily_limit:
-                    remaining = max(
-                        sender_wallet.daily_limit - spent_today, Decimal("0")
-                    )
-                    raise ValueError(
-                        f"Daily limit exceeded. Remaining today: ৳{remaining}."
-                    )
+                    remaining = max(sender_wallet.daily_limit - spent_today, Decimal("0"))
+                    raise ValueError(f"Daily limit exceeded. Remaining today: ৳{remaining}.")
 
                 sender_wallet.balance -= total_debit
                 receiver_wallet.balance += amount
@@ -162,7 +157,10 @@ class TransferView(APIView):
         except (ValueError, ObjectDoesNotExist) as e:
             logger.warning(
                 "TransferView: %s, user=%s to=%s amount=%s",
-                e, request.user.phone, receiver_phone, amount,
+                e,
+                request.user.phone,
+                receiver_phone,
+                amount,
             )
             return error_response(str(e))
 
@@ -173,16 +171,20 @@ class MoneyRequestListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        qs = MoneyRequest.objects.filter(
-            Q(requester=request.user) | Q(target=request.user)
-        ).select_related("requester", "target").order_by("-created_at")
+        qs = (
+            MoneyRequest.objects.filter(Q(requester=request.user) | Q(target=request.user))
+            .select_related("requester", "target")
+            .order_by("-created_at")
+        )
         p = paginate(qs, get_page(request), get_page_size(request))
-        return Response({
-            "count": p["count"],
-            "total_pages": p["total_pages"],
-            "page": p["page"],
-            "results": MoneyRequestSerializer(p["queryset"], many=True).data,
-        })
+        return Response(
+            {
+                "count": p["count"],
+                "total_pages": p["total_pages"],
+                "page": p["page"],
+                "results": MoneyRequestSerializer(p["queryset"], many=True).data,
+            }
+        )
 
 
 class CreateMoneyRequestView(APIView):
@@ -212,14 +214,10 @@ class CreateMoneyRequestView(APIView):
 
         Notification.objects.create(
             user=target,
-            message=(
-                f"{request.user.phone} requested ৳{amount} from you. "
-            ),
+            message=(f"{request.user.phone} requested ৳{amount} from you. "),
         )
 
-        return Response(
-            MoneyRequestSerializer(money_req).data, status=status.HTTP_201_CREATED
-        )
+        return Response(MoneyRequestSerializer(money_req).data, status=status.HTTP_201_CREATED)
 
 
 class RespondMoneyRequestView(APIView):
@@ -265,16 +263,18 @@ class RespondMoneyRequestView(APIView):
             money_req.status = "accepted"
             money_req.save(update_fields=["status"])
 
-            Notification.objects.bulk_create([
-                Notification(
-                    user=request.user,
-                    message=f"You fulfilled ৳{money_req.amount} request from {money_req.requester.phone}.",
-                ),
-                Notification(
-                    user=money_req.requester,
-                    message=f"{request.user.phone} accepted your ৳{money_req.amount} request.",
-                ),
-            ])
+            Notification.objects.bulk_create(
+                [
+                    Notification(
+                        user=request.user,
+                        message=f"You fulfilled ৳{money_req.amount} request from {money_req.requester.phone}.",
+                    ),
+                    Notification(
+                        user=money_req.requester,
+                        message=f"{request.user.phone} accepted your ৳{money_req.amount} request.",
+                    ),
+                ]
+            )
 
             return Response(MoneyRequestSerializer(money_req).data)
 

@@ -8,11 +8,13 @@ from rest_framework.views import APIView
 
 from common.pagination import get_page, get_page_size, paginate
 from common.utils import error_response
+from notifications.models import Notification
 
-from .models import Reward, PointsTransaction, Offer, UserOffer
+from .models import Offer, PointsTransaction, Reward, UserOffer
 from .serializers import (
-    RewardSerializer, PointsTransactionSerializer,
     OfferSerializer,
+    PointsTransactionSerializer,
+    RewardSerializer,
 )
 
 logger = logging.getLogger("rewards")
@@ -32,12 +34,14 @@ class PointsHistoryView(APIView):
     def get(self, request):
         qs = PointsTransaction.objects.filter(user=request.user).order_by("-created_at")
         p = paginate(qs, get_page(request), get_page_size(request))
-        return Response({
-            "count": p["count"],
-            "total_pages": p["total_pages"],
-            "page": p["page"],
-            "results": PointsTransactionSerializer(p["queryset"], many=True).data,
-        })
+        return Response(
+            {
+                "count": p["count"],
+                "total_pages": p["total_pages"],
+                "page": p["page"],
+                "results": PointsTransactionSerializer(p["queryset"], many=True).data,
+            }
+        )
 
 
 class OfferListView(APIView):
@@ -45,9 +49,7 @@ class OfferListView(APIView):
 
     def get(self, request):
         now = timezone.now()
-        offers = Offer.objects.filter(
-            is_active=True, valid_from__lte=now, valid_until__gte=now
-        )
+        offers = Offer.objects.filter(is_active=True, valid_from__lte=now, valid_until__gte=now)
         return Response(OfferSerializer(offers, many=True).data)
 
 
@@ -83,6 +85,11 @@ class ClaimOfferView(APIView):
             points=offer.points_required,
             transaction_type="redeem",
             reason=f"Redeemed: {offer.title}",
+        )
+
+        Notification.objects.create(
+            user=request.user,
+            message=(f"You redeemed {offer.points_required} points for " f"'{offer.title}'."),
         )
 
         return Response({"message": f"Offer '{offer.title}' claimed successfully."})

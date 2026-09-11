@@ -9,53 +9,80 @@ from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from accounts.models import CharityCause, Foundation, User, Nominee
+from accounts.models import CharityCause, Foundation, Nominee, User
 from agents.models import Agent, AgentTransaction
 from banking.models import Bank, BankAccount, BankTransaction
 from billpay.models import Biller, BillerCategory, BillPayment
 from cards.models import Card
 from charity.models import HawlTracking, Sadaqah, SadaqahJariyah, ZakatPayment
-from loans.models import QardHasanProduct, QardHasanApplication
+from common.utils import record_transaction
+from loans.models import QardHasanApplication, QardHasanProduct
 from merchants.models import Merchant, MerchantCategory
 from notifications.models import Notification
-from recharge.models import Operator, OperatorType, DataPack, RechargeTransaction
+from recharge.models import DataPack, Operator, OperatorType, RechargeTransaction
 from remittance.models import RemittancePartner, RemittanceTransaction
 from savings.models import MudarabahAccount, MudarabahContribution, MudarabahPlan
 from support.models import SupportCategory
-from tickets.models import TicketCategory, TicketProvider, TicketBooking, TicketTrip
+from tickets.models import TicketBooking, TicketCategory, TicketProvider, TicketTrip
 from transactions.models import Transaction
 
 PASSWORD = "12345678"
 
 TEAM = [
-    ("Dipra",   "01827668054"),
+    ("Dipra", "01827668054"),
     ("Tasdida", "01745583561"),
-    ("Arafat",  "01756469770"),
-    ("Ayeman",  "01880369079"),
-    ("Samara",  "01822995689"),
-    ("Selim",   "01612195390"),
-    ("Sijan",   "01708366765"),
-    ("Tamim",   "01303855526"),
-    ("Zabid",   "01326175976"),
-    ("Nabil",   "01835391536"),
+    ("Arafat", "01756469770"),
+    ("Ayeman", "01880369079"),
+    ("Samara", "01822995689"),
+    ("Selim", "01612195390"),
+    ("Sijan", "01708366765"),
+    ("Tamim", "01303855526"),
+    ("Zabid", "01326175976"),
+    ("Nabil", "01835391536"),
 ]
 
 BD_NAMES = [
-    "Rahim Uddin", "Karim Mia", "Sumaiya Akter", "Nasrin Begum",
-    "Rafiq Islam", "Jahanara Khatun", "Mizanur Rahman", "Shahida Parvin",
-    "Abul Hossain", "Fatema Begum", "Nurul Islam", "Roksana Akter",
-    "Shahidul Alam", "Mosammat Rina", "Belal Hossain", "Sharmin Sultana",
-    "Aminul Islam", "Halima Khatun", "Monir Hossain", "Taslima Begum",
-    "Sabbir Ahmed", "Nusrat Jahan", "Delwar Hossain", "Moriam Akter",
+    "Rahim Uddin",
+    "Karim Mia",
+    "Sumaiya Akter",
+    "Nasrin Begum",
+    "Rafiq Islam",
+    "Jahanara Khatun",
+    "Mizanur Rahman",
+    "Shahida Parvin",
+    "Abul Hossain",
+    "Fatema Begum",
+    "Nurul Islam",
+    "Roksana Akter",
+    "Shahidul Alam",
+    "Mosammat Rina",
+    "Belal Hossain",
+    "Sharmin Sultana",
+    "Aminul Islam",
+    "Halima Khatun",
+    "Monir Hossain",
+    "Taslima Begum",
+    "Sabbir Ahmed",
+    "Nusrat Jahan",
+    "Delwar Hossain",
+    "Moriam Akter",
     "Mahbubur Rahman",
 ]
 
 BD_MERCHANTS = [
-    ("Aarong", "retail"), ("Shajgoj", "retail"), ("Daraz Bangladesh", "retail"),
-    ("Kacchi Bhai", "food"), ("Haji Biriyani House", "food"), ("Star Kabab & Restaurant", "food"),
-    ("Pathao", "transport"), ("Shohoz Rides", "transport"), ("Obhai", "transport"),
-    ("DESCO", "utility"), ("Titas Gas", "utility"),
-    ("Ibn Sina Hospital", "health"), ("Brac University", "education"),
+    ("Aarong", "retail"),
+    ("Shajgoj", "retail"),
+    ("Daraz Bangladesh", "retail"),
+    ("Kacchi Bhai", "food"),
+    ("Haji Biriyani House", "food"),
+    ("Star Kabab & Restaurant", "food"),
+    ("Pathao", "transport"),
+    ("Shohoz Rides", "transport"),
+    ("Obhai", "transport"),
+    ("DESCO", "utility"),
+    ("Titas Gas", "utility"),
+    ("Ibn Sina Hospital", "health"),
+    ("Brac University", "education"),
     ("Star Cineplex", "entertainment"),
 ]
 
@@ -128,7 +155,16 @@ BD_BANKS = [
     ("ICB Islamic Bank", "ICB"),
 ]
 
-BD_DISTRICTS = ["Dhaka", "Chattogram", "Rajshahi", "Khulna", "Sylhet", "Barishal", "Rangpur", "Mymensingh"]
+BD_DISTRICTS = [
+    "Dhaka",
+    "Chattogram",
+    "Rajshahi",
+    "Khulna",
+    "Sylhet",
+    "Barishal",
+    "Rangpur",
+    "Mymensingh",
+]
 BD_THANAS = {
     "Dhaka": ["Gulshan", "Mirpur", "Dhanmondi", "Uttara", "Mohammadpur"],
     "Chattogram": ["Agrabad", "GEC", "Nasirabad"],
@@ -145,11 +181,16 @@ REMITTANCE_PARTNERS = [
 ]
 
 TICKET_PROVIDERS = [
-    ("Shohoz Bus", "bus"), ("Green Line Paribahan", "bus"), ("Hanif Enterprise", "bus"),
+    ("Shohoz Bus", "bus"),
+    ("Green Line Paribahan", "bus"),
+    ("Hanif Enterprise", "bus"),
     ("Bangladesh Railway", "train"),
-    ("US-Bangla Airlines", "airline"), ("Biman Bangladesh", "airline"),
-    ("Star Cineplex", "cinema"), ("Blockbuster Cinemas", "cinema"),
-    ("BIWTC Ferry", "ferry"), ("Green Line Waterways", "ferry"),
+    ("US-Bangla Airlines", "airline"),
+    ("Biman Bangladesh", "airline"),
+    ("Star Cineplex", "cinema"),
+    ("Blockbuster Cinemas", "cinema"),
+    ("BIWTC Ferry", "ferry"),
+    ("Green Line Waterways", "ferry"),
 ]
 
 TRAIN_COACHES = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ", "ঝ", "ঞ"]
@@ -351,9 +392,15 @@ class Command(BaseCommand):
             user.wallet.save(update_fields=["balance", "status"])
             user.save(update_fields=["is_verified", "password"])
             if not Card.objects.filter(user=user).exists():
-                card = Card(user=user, card_type="debit", cardholder_name=name,
-                             expiry_month=random.randint(1, 12), expiry_year=2029,
-                             status="active", card_network=random.choice(["visa", "mastercard"]))
+                card = Card(
+                    user=user,
+                    card_type="debit",
+                    cardholder_name=name,
+                    expiry_month=random.randint(1, 12),
+                    expiry_year=2029,
+                    status="active",
+                    card_network=random.choice(["visa", "mastercard"]),
+                )
                 card.set_number("4" + str(random.randint(100000000000000, 999999999999999))[:15])
                 card.save()
             team.append(user)
@@ -370,9 +417,15 @@ class Command(BaseCommand):
             s.wallet.save(update_fields=["balance"])
             r.wallet.save(update_fields=["balance"])
             Transaction.objects.create(
-                sender=s, receiver=r, amount=a, fee=f,
-                transaction_type="send", status="completed",
-                note=random.choice(["Lunch bill", "Chai party", "Team dinner", "Gift contrib", "Travel fare"]),
+                sender=s,
+                receiver=r,
+                amount=a,
+                fee=f,
+                transaction_type="send",
+                status="completed",
+                note=random.choice(
+                    ["Lunch bill", "Chai party", "Team dinner", "Gift contrib", "Travel fare"]
+                ),
                 created_at=self._past(60),
             )
 
@@ -419,14 +472,16 @@ class Command(BaseCommand):
     def _seed_charity_causes(self):
         for key, label, icon in CHARITY_CAUSES:
             CharityCause.objects.update_or_create(
-                key=key, defaults={"label": label, "icon": icon, "is_active": True},
+                key=key,
+                defaults={"label": label, "icon": icon, "is_active": True},
             )
         self.stdout.write(f"  + {len(CHARITY_CAUSES)} charity causes")
 
     def _seed_support_categories(self):
         for key, label in SUPPORT_CATEGORIES:
             SupportCategory.objects.update_or_create(
-                key=key, defaults={"label": label, "is_active": True},
+                key=key,
+                defaults={"label": label, "is_active": True},
             )
         self.stdout.write(f"  + {len(SUPPORT_CATEGORIES)} support categories")
 
@@ -501,12 +556,18 @@ class Command(BaseCommand):
             cause = CharityCause.objects.get(key=cause_key)
             phone = "013" + str(random.randint(10000000, 99999999))
             user = User.objects.create_user(
-                phone=phone, password=PASSWORD, full_name=name,
-                nid=self._unique_nid(), role="foundation", is_verified=True,
+                phone=phone,
+                password=PASSWORD,
+                full_name=name,
+                nid=self._unique_nid(),
+                role="foundation",
+                is_verified=True,
             )
             foundation = Foundation.objects.create(
-                user=user, organization_name=name,
-                registration_number=reg_no, cause=cause,
+                user=user,
+                organization_name=name,
+                registration_number=reg_no,
+                cause=cause,
                 description=f"Verified {cause_key} organization in Bangladesh.",
                 is_verified=True,
             )
@@ -530,7 +591,8 @@ class Command(BaseCommand):
         }
         for key in sorted(keys):
             MerchantCategory.objects.update_or_create(
-                key=key, defaults={"label": labels.get(key, key.title())},
+                key=key,
+                defaults={"label": labels.get(key, key.title())},
             )
         self.stdout.write(f"  + {len(keys)} merchant categories")
 
@@ -539,7 +601,8 @@ class Command(BaseCommand):
         merchants = []
         for user, (biz_name, category) in zip(merchant_users, BD_MERCHANTS):
             merchant = Merchant.objects.create(
-                user=user, business_name=biz_name,
+                user=user,
+                business_name=biz_name,
                 category=MerchantCategory.objects.get(key=category),
                 is_verified=random.choices([True, False], weights=[75, 25])[0],
             )
@@ -552,8 +615,16 @@ class Command(BaseCommand):
         for user in users:
             for _ in range(random.randint(1, 2)):
                 network = random.choice(networks)
-                prefixes = {"visa": "423456", "mastercard": "523456", "amex": "371234", "nexus": "623456"}
-                raw = prefixes.get(network, "423456") + str(random.randint(1000000000, 9999999999))[:10]
+                prefixes = {
+                    "visa": "423456",
+                    "mastercard": "523456",
+                    "amex": "371234",
+                    "nexus": "623456",
+                }
+                raw = (
+                    prefixes.get(network, "423456")
+                    + str(random.randint(1000000000, 9999999999))[:10]
+                )
                 card = Card(
                     user=user,
                     card_network=network,
@@ -561,7 +632,9 @@ class Command(BaseCommand):
                     cardholder_name=user.full_name,
                     expiry_month=random.randint(1, 12),
                     expiry_year=random.randint(2025, 2030),
-                    status=random.choices(["active", "blocked", "expired"], weights=[80, 10, 10])[0],
+                    status=random.choices(["active", "blocked", "expired"], weights=[80, 10, 10])[
+                        0
+                    ],
                 )
                 card.set_number(raw)
                 card.save()
@@ -572,7 +645,8 @@ class Command(BaseCommand):
         labels = {"prepaid": "Prepaid", "postpaid": "Postpaid", "both": "Both"}
         for key, label in labels.items():
             OperatorType.objects.update_or_create(
-                key=key, defaults={"label": label, "is_active": True},
+                key=key,
+                defaults={"label": label, "is_active": True},
             )
         self.stdout.write(f"  + {len(labels)} operator types")
 
@@ -580,7 +654,8 @@ class Command(BaseCommand):
         operators = []
         for name, code, op_type in BD_OPERATORS:
             op = Operator.objects.create(
-                name=name, operator_code=code,
+                name=name,
+                operator_code=code,
                 type=OperatorType.objects.get(key=op_type),
             )
             operators.append(op)
@@ -590,16 +665,21 @@ class Command(BaseCommand):
     def _seed_data_packs(self, operators):
         count = 0
         for op in operators:
-            for i, (name, vol, days, amt) in enumerate([
-                ("500 MB", "500 MB", 7, Decimal("48")),
-                ("1 GB", "1 GB", 7, Decimal("89")),
-                ("3 GB", "3 GB", 30, Decimal("199")),
-                ("5 GB", "5 GB", 30, Decimal("299")),
-                ("10 GB", "10 GB", 30, Decimal("399")),
-            ]):
+            for i, (name, vol, days, amt) in enumerate(
+                [
+                    ("500 MB", "500 MB", 7, Decimal("48")),
+                    ("1 GB", "1 GB", 7, Decimal("89")),
+                    ("3 GB", "3 GB", 30, Decimal("199")),
+                    ("5 GB", "5 GB", 30, Decimal("299")),
+                    ("10 GB", "10 GB", 30, Decimal("399")),
+                ]
+            ):
                 DataPack.objects.create(
-                    operator=op, name=name, volume=vol,
-                    validity_days=days, amount=amt,
+                    operator=op,
+                    name=name,
+                    volume=vol,
+                    validity_days=days,
+                    amount=amt,
                 )
                 count += 1
         self.stdout.write(f"  + {count} data packs")
@@ -617,7 +697,8 @@ class Command(BaseCommand):
         }
         for key in sorted(keys):
             BillerCategory.objects.update_or_create(
-                key=key, defaults={"label": labels.get(key, key.title())},
+                key=key,
+                defaults={"label": labels.get(key, key.title())},
             )
         self.stdout.write(f"  + {len(keys)} biller categories")
 
@@ -625,7 +706,8 @@ class Command(BaseCommand):
         billers = []
         for name, category, code in BD_BILLERS:
             b = Biller.objects.create(
-                name=name, category=BillerCategory.objects.get(key=category),
+                name=name,
+                category=BillerCategory.objects.get(key=category),
                 biller_code=code,
             )
             billers.append(b)
@@ -645,7 +727,8 @@ class Command(BaseCommand):
         for user in random.sample(users, min(8, len(users))):
             bank = random.choice(banks)
             BankAccount.objects.create(
-                user=user, bank=bank,
+                user=user,
+                bank=bank,
                 account_number=str(random.randint(100000000000, 999999999999)),
                 account_holder=user.full_name,
                 branch=random.choice(["Gulshan", "Mirpur", "Dhanmondi", "Motijheel"]),
@@ -656,8 +739,15 @@ class Command(BaseCommand):
 
     def _seed_agents(self):
         agents = []
-        shops = ["Mama's Store", "Rahim General Store", "City Point", "Bismillah Telecom",
-                  "Modern Shop", "Shahjalal Traders", "Dhaka Point"]
+        shops = [
+            "Mama's Store",
+            "Rahim General Store",
+            "City Point",
+            "Bismillah Telecom",
+            "Modern Shop",
+            "Shahjalal Traders",
+            "Dhaka Point",
+        ]
         for i, shop in enumerate(shops):
             dist = BD_DISTRICTS[i % len(BD_DISTRICTS)]
             thanas = BD_THANAS.get(dist, ["Central"])
@@ -686,8 +776,11 @@ class Command(BaseCommand):
             ("Qard Hasan Large", Decimal("5000"), Decimal("50000"), 90, Decimal("100.00")),
         ]:
             p = QardHasanProduct.objects.create(
-                name=name, min_amount=min_a, max_amount=max_a,
-                tenure_days=days, service_fee=fee,
+                name=name,
+                min_amount=min_a,
+                max_amount=max_a,
+                tenure_days=days,
+                service_fee=fee,
                 description=(
                     f"Interest-free benevolent loan (Qard Hasan). "
                     f"Up to ৳{max_a}, repay within {days} days. "
@@ -702,7 +795,10 @@ class Command(BaseCommand):
         partners = []
         for name, country, curr, rate in REMITTANCE_PARTNERS:
             p = RemittancePartner.objects.create(
-                name=name, country=country, currency=curr, exchange_rate=rate,
+                name=name,
+                country=country,
+                currency=curr,
+                exchange_rate=rate,
             )
             partners.append(p)
         self.stdout.write(f"  + {len(partners)} remittance partners")
@@ -720,7 +816,8 @@ class Command(BaseCommand):
         }
         for key in sorted(keys):
             TicketCategory.objects.update_or_create(
-                key=key, defaults={"label": labels.get(key, key.title())},
+                key=key,
+                defaults={"label": labels.get(key, key.title())},
             )
         self.stdout.write(f"  + {len(keys)} ticket categories")
 
@@ -728,42 +825,127 @@ class Command(BaseCommand):
         providers = []
         trip_data = {
             "bus": [
-                ("Dhaka to Chittagong Express", "Dhaka", "Chittagong", "08:00 AM", "03:00 PM", "AC", Decimal("800")),
-                ("Dhaka to Sylhet Volvo", "Dhaka", "Sylhet", "10:30 PM", "06:00 AM", "AC", Decimal("1200")),
-                ("Dhaka to Cox\'s Bazar", "Dhaka", "Cox\'s Bazar", "09:00 PM", "07:00 AM", "Non-AC", Decimal("900")),
+                (
+                    "Dhaka to Chittagong Express",
+                    "Dhaka",
+                    "Chittagong",
+                    "08:00 AM",
+                    "03:00 PM",
+                    "AC",
+                    Decimal("800"),
+                ),
+                (
+                    "Dhaka to Sylhet Volvo",
+                    "Dhaka",
+                    "Sylhet",
+                    "10:30 PM",
+                    "06:00 AM",
+                    "AC",
+                    Decimal("1200"),
+                ),
+                (
+                    "Dhaka to Cox's Bazar",
+                    "Dhaka",
+                    "Cox's Bazar",
+                    "09:00 PM",
+                    "07:00 AM",
+                    "Non-AC",
+                    Decimal("900"),
+                ),
             ],
             "train": [
-                ("Subarna Express (702)", "Dhaka", "Chittagong", "07:00 AM", "01:30 PM", "First Class", Decimal("500")),
-                ("Parabat Express (710)", "Dhaka", "Sylhet", "10:15 PM", "06:45 AM", "AC", Decimal("750")),
-                ("Ekota Express (724)", "Dhaka", "Dinajpur", "08:30 AM", "04:00 PM", "Shovon", Decimal("400")),
+                (
+                    "Subarna Express (702)",
+                    "Dhaka",
+                    "Chittagong",
+                    "07:00 AM",
+                    "01:30 PM",
+                    "First Class",
+                    Decimal("500"),
+                ),
+                (
+                    "Parabat Express (710)",
+                    "Dhaka",
+                    "Sylhet",
+                    "10:15 PM",
+                    "06:45 AM",
+                    "AC",
+                    Decimal("750"),
+                ),
+                (
+                    "Ekota Express (724)",
+                    "Dhaka",
+                    "Dinajpur",
+                    "08:30 AM",
+                    "04:00 PM",
+                    "Shovon",
+                    Decimal("400"),
+                ),
             ],
             "airline": [
-                ("BS-101 Dhaka to Chittagong", "Dhaka", "Chittagong", "09:00 AM", "09:50 AM", "Economy", Decimal("3500")),
-                ("BG-202 Dhaka to Sylhet", "Dhaka", "Sylhet", "02:00 PM", "02:45 PM", "Economy", Decimal("3000")),
+                (
+                    "BS-101 Dhaka to Chittagong",
+                    "Dhaka",
+                    "Chittagong",
+                    "09:00 AM",
+                    "09:50 AM",
+                    "Economy",
+                    Decimal("3500"),
+                ),
+                (
+                    "BG-202 Dhaka to Sylhet",
+                    "Dhaka",
+                    "Sylhet",
+                    "02:00 PM",
+                    "02:45 PM",
+                    "Economy",
+                    Decimal("3000"),
+                ),
             ],
             "cinema": [
                 ("The Blockbuster", "", "", "03:00 PM", "06:00 PM", "Regular", Decimal("300")),
                 ("Avenger Returns", "", "", "06:30 PM", "09:30 PM", "Premium", Decimal("500")),
             ],
             "ferry": [
-                ("MV Karnafuli", "Dhaka", "Barisal", "06:00 PM", "06:00 AM", "Cabin", Decimal("600")),
+                (
+                    "MV Karnafuli",
+                    "Dhaka",
+                    "Barisal",
+                    "06:00 PM",
+                    "06:00 AM",
+                    "Cabin",
+                    Decimal("600"),
+                ),
                 ("MV Sundarban", "Dhaka", "Khulna", "07:00 PM", "07:00 AM", "Deck", Decimal("350")),
             ],
             "event": [
-                ("Bangladesh Music Fest 2026", "", "", "05:00 PM", "10:00 PM", "VIP", Decimal("2000")),
+                (
+                    "Bangladesh Music Fest 2026",
+                    "",
+                    "",
+                    "05:00 PM",
+                    "10:00 PM",
+                    "VIP",
+                    Decimal("2000"),
+                ),
             ],
         }
 
         for name, cat in TICKET_PROVIDERS:
             p = TicketProvider.objects.create(
-                name=name, category=TicketCategory.objects.get(key=cat),
+                name=name,
+                category=TicketCategory.objects.get(key=cat),
             )
             for trip in trip_data.get(cat, []):
                 TicketTrip.objects.create(
                     provider=p,
-                    name=trip[0], origin=trip[1], destination=trip[2],
-                    departure_time=trip[3], arrival_time=trip[4],
-                    coach_class=trip[5], price=trip[6],
+                    name=trip[0],
+                    origin=trip[1],
+                    destination=trip[2],
+                    departure_time=trip[3],
+                    arrival_time=trip[4],
+                    coach_class=trip[5],
+                    price=trip[6],
                     coaches=TRAIN_COACHES if cat == "train" else [],
                 )
             providers.append(p)
@@ -781,8 +963,11 @@ class Command(BaseCommand):
         plans = []
         for name, months, monthly, profit in plans_data:
             plan = MudarabahPlan.objects.create(
-                name=name, duration_months=months,
-                monthly_amount=monthly, profit_ratio=profit, is_active=True,
+                name=name,
+                duration_months=months,
+                monthly_amount=monthly,
+                profit_ratio=profit,
+                is_active=True,
             )
             plans.append(plan)
         self.stdout.write(f"  + {len(plans)} plans")
@@ -797,11 +982,20 @@ class Command(BaseCommand):
             paid = random.randint(1, min(plan.duration_months, 6))
             for i in range(1, paid + 1):
                 MudarabahContribution.objects.create(
-                    mudarabah_account=account, installment_number=i, amount=plan.monthly_amount,
+                    mudarabah_account=account,
+                    installment_number=i,
+                    amount=plan.monthly_amount,
                 )
             account.total_deposited = plan.monthly_amount * paid
             account.update_expected_payout()
             account.save(update_fields=["total_deposited", "expected_payout"])
+            record_transaction(
+                sender=user,
+                transaction_type="savings",
+                amount=account.total_deposited,
+                note=f"{plan.name} - {paid} installment(s)",
+                counterparty=plan.name,
+            )
             count += 1
         self.stdout.write(f"  + {count} Mudarabah accounts")
 
@@ -822,9 +1016,21 @@ class Command(BaseCommand):
             sender.wallet.save(update_fields=["balance"])
             receiver.wallet.save(update_fields=["balance"])
             Transaction.objects.create(
-                sender=sender, receiver=receiver, amount=amount, fee=fee,
-                transaction_type="send", status="completed",
-                note=random.choice(["House rent", "Grocery bill", "Tuition fee", "Medicine cost", "Salary transfer"]),
+                sender=sender,
+                receiver=receiver,
+                amount=amount,
+                fee=fee,
+                transaction_type="send",
+                status="completed",
+                note=random.choice(
+                    [
+                        "House rent",
+                        "Grocery bill",
+                        "Tuition fee",
+                        "Medicine cost",
+                        "Salary transfer",
+                    ]
+                ),
                 created_at=self._past(),
             )
 
@@ -844,9 +1050,15 @@ class Command(BaseCommand):
             sender.wallet.save(update_fields=["balance"])
             merchant.user.wallet.save(update_fields=["balance"])
             Transaction.objects.create(
-                sender=sender, receiver=merchant.user, merchant=merchant,
-                amount=amount, fee=fee, transaction_type="payment", status="completed",
-                note=f"Payment at {merchant.business_name}", created_at=self._past(),
+                sender=sender,
+                receiver=merchant.user,
+                merchant=merchant,
+                amount=amount,
+                fee=fee,
+                transaction_type="payment",
+                status="completed",
+                note=f"Payment at {merchant.business_name}",
+                created_at=self._past(),
             )
 
         for _ in range(20):
@@ -855,8 +1067,12 @@ class Command(BaseCommand):
             user.wallet.balance += amount
             user.wallet.save(update_fields=["balance"])
             Transaction.objects.create(
-                sender=None, receiver=user, amount=amount, fee=Decimal("0.00"),
-                transaction_type="cash_in", status="completed",
+                sender=None,
+                receiver=user,
+                amount=amount,
+                fee=Decimal("0.00"),
+                transaction_type="cash_in",
+                status="completed",
                 note=random.choice(["Agent cash in", "Bank deposit", "Salary top-up"]),
                 created_at=self._past(),
             )
@@ -869,8 +1085,12 @@ class Command(BaseCommand):
             sender.wallet.balance -= amount + fee
             sender.wallet.save(update_fields=["balance"])
             Transaction.objects.create(
-                sender=sender, receiver=None, amount=amount, fee=fee,
-                transaction_type="cash_out", status="completed",
+                sender=sender,
+                receiver=None,
+                amount=amount,
+                fee=fee,
+                transaction_type="cash_out",
+                status="completed",
                 note=random.choice(["ATM withdrawal", "Agent cash out", "Emergency cash"]),
                 created_at=self._past(),
             )
@@ -894,10 +1114,25 @@ class Command(BaseCommand):
             user.wallet.save(update_fields=["balance"])
             commission = (amount * agent.commission_pct / Decimal("100")).quantize(Decimal("0.01"))
             AgentTransaction.objects.create(
-                user=user, agent=agent, amount=amount, fee=fee,
-                commission=commission, transaction_type=txn_type,
+                user=user,
+                agent=agent,
+                amount=amount,
+                fee=fee,
+                commission=commission,
+                transaction_type=txn_type,
                 reference="AGT" + str(random.randint(10000000, 99999999)),
-                status="completed", created_at=self._past(),
+                status="completed",
+                created_at=self._past(),
+            )
+            record_transaction(
+                sender=user if txn_type == "cash_out" else None,
+                receiver=user if txn_type == "cash_in" else None,
+                transaction_type=txn_type,
+                amount=amount,
+                fee=fee,
+                note=f"Agent cash {'out' if txn_type == 'cash_out' else 'in'} at "
+                f"{agent.shop_name or agent.full_name}",
+                counterparty=agent.shop_name or agent.full_name,
             )
             count += 1
         self.stdout.write(f"  + {count} agent transactions")
@@ -914,12 +1149,22 @@ class Command(BaseCommand):
             user.wallet.balance -= amount
             user.wallet.save(update_fields=["balance"])
             RechargeTransaction.objects.create(
-                user=user, operator=op,
+                user=user,
+                operator=op,
                 phone_number="01" + str(random.randint(700000000, 999999999)),
-                amount=amount, fee=Decimal("0.00"),
+                amount=amount,
+                fee=Decimal("0.00"),
                 recharge_type="prepaid",
                 reference="RCH" + str(random.randint(10000000, 99999999)),
-                status="completed", created_at=self._past(),
+                status="completed",
+                created_at=self._past(),
+            )
+            record_transaction(
+                sender=user,
+                transaction_type="recharge",
+                amount=amount,
+                note=f"{op.name} prepaid recharge",
+                counterparty=op.name,
             )
             count += 1
         self.stdout.write(f"  + {count} recharges")
@@ -936,12 +1181,22 @@ class Command(BaseCommand):
             user.wallet.balance -= amount
             user.wallet.save(update_fields=["balance"])
             BillPayment.objects.create(
-                user=user, biller=biller,
+                user=user,
+                biller=biller,
                 account_number=str(random.randint(100000000, 999999999)),
-                amount=amount, fee=Decimal("0.00"),
+                amount=amount,
+                fee=Decimal("0.00"),
                 bill_month=f"{random.randint(1,12):02d}/2026",
                 reference="BILL" + str(random.randint(10000000, 99999999)),
-                status="completed", created_at=self._past(),
+                status="completed",
+                created_at=self._past(),
+            )
+            record_transaction(
+                sender=user,
+                transaction_type="bill",
+                amount=amount,
+                note=f"{biller.name} bill",
+                counterparty=biller.name,
             )
             count += 1
         self.stdout.write(f"  + {count} bill payments")
@@ -969,8 +1224,23 @@ class Command(BaseCommand):
                 fee = Decimal("0.00")
             user.wallet.save(update_fields=["balance"])
             BankTransaction.objects.create(
-                user=user, bank_account=ba, amount=amount, fee=fee,
-                transaction_type=txn_type, status="completed", created_at=self._past(),
+                user=user,
+                bank_account=ba,
+                amount=amount,
+                fee=fee,
+                transaction_type=txn_type,
+                status="completed",
+                created_at=self._past(),
+            )
+            record_transaction(
+                sender=user if txn_type == "withdraw" else None,
+                receiver=user if txn_type == "add_money" else None,
+                transaction_type="bank",
+                amount=amount,
+                fee=fee,
+                note=("Withdrew to " if txn_type == "withdraw" else "Added money from ")
+                + ba.bank.name,
+                counterparty=ba.bank.name,
             )
             count += 1
         self.stdout.write(f"  + {count} bank transactions")
@@ -989,13 +1259,32 @@ class Command(BaseCommand):
             user.wallet.balance += amount
             user.wallet.save(update_fields=["balance"])
             QardHasanApplication.objects.create(
-                user=user, product=product, amount=amount,
-                service_fee=product.service_fee, amount_due=due,
-                amount_paid=Decimal("0.00"), tenure_days=product.tenure_days,
+                user=user,
+                product=product,
+                amount=amount,
+                service_fee=product.service_fee,
+                amount_due=due,
+                amount_paid=Decimal("0.00"),
+                tenure_days=product.tenure_days,
                 status=random.choice(["disbursed", "repaid"]),
                 due_date=date.today() + timedelta(days=random.randint(1, 60)),
                 disbursed_at=self._past(),
                 created_at=self._past(60),
+            )
+            if product.service_fee > 0:
+                record_transaction(
+                    sender=user,
+                    transaction_type="loan",
+                    amount=product.service_fee,
+                    note=f"{product.name} service fee",
+                    counterparty=product.name,
+                )
+            record_transaction(
+                receiver=user,
+                transaction_type="loan",
+                amount=amount,
+                note=f"{product.name} disbursed",
+                counterparty=product.name,
             )
             count += 1
         self.stdout.write(f"  + {count} Qard Hasan applications")
@@ -1012,12 +1301,22 @@ class Command(BaseCommand):
             user.wallet.balance += bdt
             user.wallet.save(update_fields=["balance"])
             RemittanceTransaction.objects.create(
-                user=user, partner=partner,
+                user=user,
+                partner=partner,
                 sender_name=random.choice(BD_NAMES),
                 sender_country=partner.country,
-                amount_foreign=foreign, amount_bdt=bdt,
+                amount_foreign=foreign,
+                amount_bdt=bdt,
                 exchange_rate=partner.exchange_rate,
-                status="completed", created_at=self._past(30),
+                status="completed",
+                created_at=self._past(30),
+            )
+            record_transaction(
+                receiver=user,
+                transaction_type="remittance",
+                amount=bdt,
+                note=f"Remittance via {partner.name}",
+                counterparty=partner.name,
             )
             count += 1
         self.stdout.write(f"  + {count} remittance transactions")
@@ -1051,6 +1350,13 @@ class Command(BaseCommand):
                 status="confirmed",
                 created_at=self._past(14),
             )
+            record_transaction(
+                sender=user,
+                transaction_type="ticket",
+                amount=amount,
+                note=f"{provider.name} ticket {trip.origin} to {trip.destination}",
+                counterparty=provider.name,
+            )
             count += 1
         self.stdout.write(f"  + {count} ticket bookings")
 
@@ -1060,46 +1366,74 @@ class Command(BaseCommand):
             wealth = Decimal(str(random.randint(100000, 2000000)))
             zakat = (wealth * Decimal("2.5")) / Decimal("100")
             foundation = random.choice(foundations)
+            zakat_amount = zakat.quantize(Decimal("0.01"))
             ZakatPayment.objects.create(
-                user=user, recipient=foundation.user,
-                amount=zakat.quantize(Decimal("0.01")),
+                user=user,
+                recipient=foundation.user,
+                amount=zakat_amount,
                 asset_type=random.choice(["cash", "gold", "business"]),
                 hawl_year=2026,
             )
-            foundation.user.wallet.balance += zakat.quantize(Decimal("0.01"))
+            foundation.user.wallet.balance += zakat_amount
             foundation.user.wallet.save(update_fields=["balance"])
+            record_transaction(
+                sender=user,
+                receiver=foundation.user,
+                transaction_type="charity",
+                amount=zakat_amount,
+                note=f"Zakat to {foundation.organization_name}",
+                counterparty=foundation.organization_name,
+            )
             count += 1
         self.stdout.write(f"  + {count} zakat payments")
 
     def _seed_sadaqah(self, users, foundations):
         causes = list(CharityCause.objects.all())
-        donations = [Sadaqah(
-            user=random.choice(users),
-            recipient=random.choice(foundations).user,
-            amount=Decimal(str(random.randint(50, 5000))),
-            cause=random.choice(causes),
-        ) for _ in range(20)]
+        donations = [
+            Sadaqah(
+                user=random.choice(users),
+                recipient=random.choice(foundations).user,
+                amount=Decimal(str(random.randint(50, 5000))),
+                cause=random.choice(causes),
+            )
+            for _ in range(20)
+        ]
         Sadaqah.objects.bulk_create(donations)
         for d in donations:
             if d.recipient:
                 d.recipient.wallet.balance += d.amount
                 d.recipient.wallet.save(update_fields=["balance"])
+                record_transaction(
+                    sender=d.user,
+                    receiver=d.recipient,
+                    transaction_type="charity",
+                    amount=d.amount,
+                    note="Sadaqah",
+                    counterparty=d.recipient.full_name,
+                )
         self.stdout.write(f"  + {len(donations)} sadaqah donations")
 
     def _seed_notifications(self, users):
         templates = [
-            "You sent {amount} BDT successfully.", "You received {amount} BDT.",
-            "Cash in of {amount} BDT completed.", "Cash out of {amount} BDT completed.",
-            "Your transaction of {amount} BDT failed.", "QR payment of {amount} BDT was successful.",
-            "Your account has been verified.", "A new login was detected on your account.",
-            "Your daily limit has been reset.", "Welcome to Yaqeen!",
+            "You sent {amount} BDT successfully.",
+            "You received {amount} BDT.",
+            "Cash in of {amount} BDT completed.",
+            "Cash out of {amount} BDT completed.",
+            "Your transaction of {amount} BDT failed.",
+            "QR payment of {amount} BDT was successful.",
+            "Your account has been verified.",
+            "A new login was detected on your account.",
+            "Your daily limit has been reset.",
+            "Welcome to Yaqeen!",
             "Your recharge of {amount} BDT was successful.",
             "Bill payment of {amount} BDT completed.",
         ]
         notifications = [
-            Notification(user=random.choice(users),
-                         message=random.choice(templates).format(amount=random.randint(50, 10000)),
-                         is_read=random.choices([True, False], weights=[40, 60])[0])
+            Notification(
+                user=random.choice(users),
+                message=random.choice(templates).format(amount=random.randint(50, 10000)),
+                is_read=random.choices([True, False], weights=[40, 60])[0],
+            )
             for _ in range(50)
         ]
         Notification.objects.bulk_create(notifications)
@@ -1126,12 +1460,24 @@ class Command(BaseCommand):
             foundation = random.choice(foundations)
             amount = Decimal(str(random.randint(100, 2000)))
             SadaqahJariyah.objects.create(
-                user=user, recipient=foundation.user,
-                amount=amount, cause=random.choice(causes),
-                frequency="monthly", is_active=True, total_donated=amount,
+                user=user,
+                recipient=foundation.user,
+                amount=amount,
+                cause=random.choice(causes),
+                frequency="monthly",
+                is_active=True,
+                total_donated=amount,
             )
             foundation.user.wallet.balance += amount
             foundation.user.wallet.save(update_fields=["balance"])
+            record_transaction(
+                sender=user,
+                receiver=foundation.user,
+                transaction_type="charity",
+                amount=amount,
+                note=f"Sadaqah Jariyah to {foundation.organization_name}",
+                counterparty=foundation.organization_name,
+            )
             count += 1
         self.stdout.write(f"  + {count} Sadaqah Jariyah subscriptions")
 
@@ -1152,7 +1498,9 @@ class Command(BaseCommand):
 
     def _past(self, days=90):
         offset = random.randint(1, days)
-        return timezone.now() - timedelta(days=offset, hours=random.randint(0, 23), minutes=random.randint(0, 59))
+        return timezone.now() - timedelta(
+            days=offset, hours=random.randint(0, 23), minutes=random.randint(0, 59)
+        )
 
     def _unique_phone(self):
         prefixes = ["01711", "01811", "01911", "01611", "01511", "01311", "01412"]

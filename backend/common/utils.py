@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from accounts.models import Wallet
+from notifications.models import Notification
 from transactions.models import Transaction
 
 
@@ -33,6 +34,47 @@ def credit_wallet(user, amount):
     wallet.balance += amount
     wallet.save(update_fields=["balance"])
     return wallet
+
+
+def record_transaction(
+    *,
+    sender=None,
+    receiver=None,
+    merchant=None,
+    transaction_type,
+    amount,
+    fee=Decimal("0.00"),
+    note="",
+    counterparty="",
+    sender_message=None,
+    receiver_message=None,
+):
+    """Record a unified ledger entry and any related notifications.
+
+    Must be called inside a ``transaction.atomic()`` block when it accompanies
+    a wallet mutation so the ledger and balance stay in sync.
+    """
+    txn = Transaction.objects.create(
+        sender=sender,
+        receiver=receiver,
+        merchant=merchant,
+        transaction_type=transaction_type,
+        amount=amount,
+        fee=fee,
+        note=note,
+        counterparty=counterparty,
+        status="completed",
+    )
+
+    notifications = []
+    if sender is not None and sender_message:
+        notifications.append(Notification(user=sender, message=sender_message))
+    if receiver is not None and receiver_message:
+        notifications.append(Notification(user=receiver, message=receiver_message))
+    if notifications:
+        Notification.objects.bulk_create(notifications)
+
+    return txn
 
 
 def user_objects_or_error(model_class, **kwargs):

@@ -9,10 +9,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.pagination import get_page, get_page_size, paginate
-from common.utils import error_response, locked_deduct_wallet
+from common.utils import error_response, locked_deduct_wallet, record_transaction
 
 from .models import Biller, BillerCategory, BillPayment
-from .serializers import BillerSerializer, PayBillSerializer, BillPaymentSerializer
+from .serializers import BillerSerializer, BillPaymentSerializer, PayBillSerializer
 
 logger = logging.getLogger("billpay")
 
@@ -46,9 +46,7 @@ class BillerListView(APIView):
         qs = Biller.objects.filter(is_active=True).select_related("category")
         if category:
             qs = qs.filter(category__key=category)
-        return Response(
-            BillerSerializer(qs, many=True, context={"request": request}).data
-        )
+        return Response(BillerSerializer(qs, many=True, context={"request": request}).data)
 
 
 class PayBillView(APIView):
@@ -84,26 +82,43 @@ class PayBillView(APIView):
             status="completed",
         )
 
+        record_transaction(
+            sender=request.user,
+            transaction_type="bill",
+            amount=amount,
+            note=f"{biller.name} bill {payment.bill_month}".strip(),
+            counterparty=biller.name,
+            sender_message=(
+                f"You paid ৳{amount} to {biller.name} for account " f"{account_number}. Ref: {ref}"
+            ),
+        )
+
         logger.info(
             "BillPay: user=%s biller=%s account=%s amount=%s ref=%s",
-            request.user.phone, biller.name, account_number, amount, ref,
+            request.user.phone,
+            biller.name,
+            account_number,
+            amount,
+            ref,
         )
-        return Response(
-            BillPaymentSerializer(payment).data, status=status.HTTP_201_CREATED
-        )
+        return Response(BillPaymentSerializer(payment).data, status=status.HTTP_201_CREATED)
 
 
 class BillHistoryView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        qs = BillPayment.objects.filter(
-            user=request.user
-        ).select_related("biller").order_by("-created_at")
+        qs = (
+            BillPayment.objects.filter(user=request.user)
+            .select_related("biller")
+            .order_by("-created_at")
+        )
         p = paginate(qs, get_page(request), get_page_size(request))
-        return Response({
-            "count": p["count"],
-            "total_pages": p["total_pages"],
-            "page": p["page"],
-            "results": BillPaymentSerializer(p["queryset"], many=True).data,
-        })
+        return Response(
+            {
+                "count": p["count"],
+                "total_pages": p["total_pages"],
+                "page": p["page"],
+                "results": BillPaymentSerializer(p["queryset"], many=True).data,
+            }
+        )

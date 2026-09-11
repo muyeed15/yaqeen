@@ -8,12 +8,20 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.pagination import get_page, get_page_size, paginate
-from common.utils import credit_wallet, error_response, locked_deduct_wallet
+from common.utils import (
+    credit_wallet,
+    error_response,
+    locked_deduct_wallet,
+    record_transaction,
+)
 
 from .models import Bank, BankAccount, BankTransaction
 from .serializers import (
-    BankSerializer, BankAccountSerializer, BankTransactionSerializer,
-    AddMoneySerializer, WithdrawSerializer,
+    AddMoneySerializer,
+    BankAccountSerializer,
+    BankSerializer,
+    BankTransactionSerializer,
+    WithdrawSerializer,
 )
 
 logger = logging.getLogger("banking")
@@ -31,18 +39,14 @@ class BankAccountListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        accounts = BankAccount.objects.filter(
-            user=request.user
-        ).select_related("bank")
+        accounts = BankAccount.objects.filter(user=request.user).select_related("bank")
         return Response(BankAccountSerializer(accounts, many=True).data)
 
     def post(self, request):
         serializer = BankAccountSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         account = serializer.save(user=request.user)
-        return Response(
-            BankAccountSerializer(account).data, status=status.HTTP_201_CREATED
-        )
+        return Response(BankAccountSerializer(account).data, status=status.HTTP_201_CREATED)
 
 
 class BankAccountDeleteView(APIView):
@@ -69,9 +73,7 @@ class AddMoneyView(APIView):
         amount = serializer.validated_data["amount"]
 
         try:
-            bank_account = BankAccount.objects.get(
-                id=bank_account_id, user=request.user
-            )
+            bank_account = BankAccount.objects.get(id=bank_account_id, user=request.user)
         except BankAccount.DoesNotExist:
             return error_response("Bank account not found.")
 
@@ -86,14 +88,29 @@ class AddMoneyView(APIView):
             status="completed",
         )
 
+        bank_name = bank_account.bank.name
+        record_transaction(
+            receiver=request.user,
+            transaction_type="bank",
+            amount=amount,
+            fee=Decimal("0.00"),
+            note=f"Added money from {bank_name}",
+            counterparty=bank_name,
+            receiver_message=(
+                f"You added ৳{amount} from {bank_name} account ending "
+                f"{bank_account.account_number[-4:]}."
+            ),
+        )
+
         logger.info(
             "AddMoney: user=%s bank=%s account=%s amount=%s ref=%s",
-            request.user.phone, bank_account.bank.name,
-            bank_account.account_number[-4:], amount, txn.reference,
+            request.user.phone,
+            bank_account.bank.name,
+            bank_account.account_number[-4:],
+            amount,
+            txn.reference,
         )
-        return Response(
-            BankTransactionSerializer(txn).data, status=status.HTTP_201_CREATED
-        )
+        return Response(BankTransactionSerializer(txn).data, status=status.HTTP_201_CREATED)
 
 
 class WithdrawView(APIView):
@@ -108,9 +125,7 @@ class WithdrawView(APIView):
         amount = serializer.validated_data["amount"]
 
         try:
-            bank_account = BankAccount.objects.get(
-                id=bank_account_id, user=request.user
-            )
+            bank_account = BankAccount.objects.get(id=bank_account_id, user=request.user)
         except BankAccount.DoesNotExist:
             return error_response("Bank account not found.")
 
@@ -130,27 +145,47 @@ class WithdrawView(APIView):
             status="completed",
         )
 
+        bank_name = bank_account.bank.name
+        record_transaction(
+            sender=request.user,
+            transaction_type="bank",
+            amount=amount,
+            fee=fee,
+            note=f"Withdrew to {bank_name}",
+            counterparty=bank_name,
+            sender_message=(
+                f"You withdrew ৳{amount} (fee ৳{fee}) to {bank_name} account ending "
+                f"{bank_account.account_number[-4:]}."
+            ),
+        )
+
         logger.info(
             "Withdraw: user=%s bank=%s account=%s amount=%s fee=%s ref=%s",
-            request.user.phone, bank_account.bank.name,
-            bank_account.account_number[-4:], amount, fee, txn.reference,
+            request.user.phone,
+            bank_account.bank.name,
+            bank_account.account_number[-4:],
+            amount,
+            fee,
+            txn.reference,
         )
-        return Response(
-            BankTransactionSerializer(txn).data, status=status.HTTP_201_CREATED
-        )
+        return Response(BankTransactionSerializer(txn).data, status=status.HTTP_201_CREATED)
 
 
 class BankTransactionHistoryView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        qs = BankTransaction.objects.filter(
-            user=request.user
-        ).select_related("bank_account__bank").order_by("-created_at")
+        qs = (
+            BankTransaction.objects.filter(user=request.user)
+            .select_related("bank_account__bank")
+            .order_by("-created_at")
+        )
         p = paginate(qs, get_page(request), get_page_size(request))
-        return Response({
-            "count": p["count"],
-            "total_pages": p["total_pages"],
-            "page": p["page"],
-            "results": BankTransactionSerializer(p["queryset"], many=True).data,
-        })
+        return Response(
+            {
+                "count": p["count"],
+                "total_pages": p["total_pages"],
+                "page": p["page"],
+                "results": BankTransactionSerializer(p["queryset"], many=True).data,
+            }
+        )

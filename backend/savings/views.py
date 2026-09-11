@@ -4,8 +4,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from common.utils import (error_response, list_objects,
-                           locked_deduct_wallet,user_objects_or_error)
+from common.utils import (
+    error_response,
+    list_objects,
+    locked_deduct_wallet,
+    record_transaction,
+    user_objects_or_error,
+)
 
 from .models import MudarabahAccount, MudarabahContribution, MudarabahPlan
 from .serializers import (
@@ -44,11 +49,24 @@ class MudarabahAccountListCreate(APIView):
 
         account = MudarabahAccount.objects.create(user=request.user, plan=plan)
         MudarabahContribution.objects.create(
-            mudarabah_account=account, installment_number=1, amount=plan.monthly_amount,
+            mudarabah_account=account,
+            installment_number=1,
+            amount=plan.monthly_amount,
         )
         account.total_deposited = plan.monthly_amount
         account.update_expected_payout()
         account.save()
+
+        record_transaction(
+            sender=request.user,
+            transaction_type="savings",
+            amount=plan.monthly_amount,
+            note=f"{plan.name} installment 1",
+            counterparty=plan.name,
+            sender_message=(
+                f"You paid ৳{plan.monthly_amount} as the first contribution to " f"{plan.name}."
+            ),
+        )
 
         return Response(MudarabahAccountSerializer(account).data, status=status.HTTP_201_CREATED)
 
@@ -58,7 +76,9 @@ class MudarabahAccountDetail(APIView):
 
     def get(self, request, account_number):
         account = user_objects_or_error(
-            MudarabahAccount, account_number=account_number, user=request.user,
+            MudarabahAccount,
+            account_number=account_number,
+            user=request.user,
         )
         if account is None:
             return error_response("Account not found", status.HTTP_404_NOT_FOUND)
@@ -70,7 +90,9 @@ class MudarabahContributionHistory(APIView):
 
     def get(self, request, account_number):
         account = user_objects_or_error(
-            MudarabahAccount, account_number=account_number, user=request.user,
+            MudarabahAccount,
+            account_number=account_number,
+            user=request.user,
         )
         if account is None:
             return error_response("Account not found", status.HTTP_404_NOT_FOUND)
@@ -97,9 +119,11 @@ class PayMudarabahContribution(APIView):
 
         amount = serializer.validated_data["amount"]
 
-        last_contribution = MudarabahContribution.objects.filter(
-            mudarabah_account=account
-        ).order_by("-installment_number").first()
+        last_contribution = (
+            MudarabahContribution.objects.filter(mudarabah_account=account)
+            .order_by("-installment_number")
+            .first()
+        )
         next_number = (last_contribution.installment_number + 1) if last_contribution else 1
 
         if next_number > account.plan.duration_months:
@@ -110,11 +134,24 @@ class PayMudarabahContribution(APIView):
             return error_response("Insufficient balance")
 
         MudarabahContribution.objects.create(
-            mudarabah_account=account, installment_number=next_number, amount=amount,
+            mudarabah_account=account,
+            installment_number=next_number,
+            amount=amount,
         )
         account.total_deposited += amount
         account.update_expected_payout()
         account.save()
+
+        record_transaction(
+            sender=request.user,
+            transaction_type="savings",
+            amount=amount,
+            note=f"{account.plan.name} installment {next_number}",
+            counterparty=account.plan.name,
+            sender_message=(
+                f"You paid ৳{amount} for {account.plan.name} installment " f"#{next_number}."
+            ),
+        )
 
         if next_number == account.plan.duration_months:
             account.status = "matured"

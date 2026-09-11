@@ -9,11 +9,18 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.pagination import get_page, get_page_size, paginate
-from common.utils import credit_wallet, error_response, locked_deduct_wallet
+from common.utils import (
+    credit_wallet,
+    error_response,
+    locked_deduct_wallet,
+    record_transaction,
+)
 
 from .models import Agent, AgentTransaction
 from .serializers import (
-    AgentSerializer, CashInOutSerializer, AgentTransactionSerializer,
+    AgentSerializer,
+    AgentTransactionSerializer,
+    CashInOutSerializer,
 )
 
 logger = logging.getLogger("agents")
@@ -28,12 +35,14 @@ class AgentListView(APIView):
         if district:
             qs = qs.filter(district__iexact=district)
         p = paginate(qs, get_page(request), get_page_size(request))
-        return Response({
-            "count": p["count"],
-            "total_pages": p["total_pages"],
-            "page": p["page"],
-            "results": AgentSerializer(p["queryset"], many=True).data,
-        })
+        return Response(
+            {
+                "count": p["count"],
+                "total_pages": p["total_pages"],
+                "page": p["page"],
+                "results": AgentSerializer(p["queryset"], many=True).data,
+            }
+        )
 
 
 class AgentDetailView(APIView):
@@ -79,13 +88,27 @@ class CashInView(APIView):
             status="completed",
         )
 
+        agent_name = agent.shop_name or agent.full_name
+        record_transaction(
+            receiver=request.user,
+            transaction_type="cash_in",
+            amount=amount,
+            fee=Decimal("0.00"),
+            note=f"Agent cash in at {agent_name}",
+            counterparty=agent_name,
+            receiver_message=(
+                f"You cashed in ৳{amount} via {agent.full_name} at {agent_name}. " f"Ref: {ref}"
+            ),
+        )
+
         logger.info(
             "CashIn: user=%s agent=%s amount=%s ref=%s",
-            request.user.phone, agent.phone, amount, ref,
+            request.user.phone,
+            agent.phone,
+            amount,
+            ref,
         )
-        return Response(
-            AgentTransactionSerializer(txn).data, status=status.HTTP_201_CREATED
-        )
+        return Response(AgentTransactionSerializer(txn).data, status=status.HTTP_201_CREATED)
 
 
 class CashOutView(APIView):
@@ -124,26 +147,46 @@ class CashOutView(APIView):
             status="completed",
         )
 
+        agent_name = agent.shop_name or agent.full_name
+        record_transaction(
+            sender=request.user,
+            transaction_type="cash_out",
+            amount=amount,
+            fee=fee,
+            note=f"Agent cash out at {agent_name}",
+            counterparty=agent_name,
+            sender_message=(
+                f"You cashed out ৳{amount} (fee ৳{fee}) via {agent.full_name} at "
+                f"{agent_name}. Ref: {ref}"
+            ),
+        )
+
         logger.info(
             "CashOut: user=%s agent=%s amount=%s fee=%s ref=%s",
-            request.user.phone, agent.phone, amount, fee, ref,
+            request.user.phone,
+            agent.phone,
+            amount,
+            fee,
+            ref,
         )
-        return Response(
-            AgentTransactionSerializer(txn).data, status=status.HTTP_201_CREATED
-        )
+        return Response(AgentTransactionSerializer(txn).data, status=status.HTTP_201_CREATED)
 
 
 class AgentTransactionHistoryView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        qs = AgentTransaction.objects.filter(
-            user=request.user
-        ).select_related("agent").order_by("-created_at")
+        qs = (
+            AgentTransaction.objects.filter(user=request.user)
+            .select_related("agent")
+            .order_by("-created_at")
+        )
         p = paginate(qs, get_page(request), get_page_size(request))
-        return Response({
-            "count": p["count"],
-            "total_pages": p["total_pages"],
-            "page": p["page"],
-            "results": AgentTransactionSerializer(p["queryset"], many=True).data,
-        })
+        return Response(
+            {
+                "count": p["count"],
+                "total_pages": p["total_pages"],
+                "page": p["page"],
+                "results": AgentTransactionSerializer(p["queryset"], many=True).data,
+            }
+        )

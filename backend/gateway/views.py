@@ -7,9 +7,14 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from common.utils import credit_wallet, error_response, locked_deduct_wallet
+from common.utils import (
+    credit_wallet,
+    error_response,
+    locked_deduct_wallet,
+    record_transaction,
+)
 
-from .models import PaymentGateway, GatewayTransaction
+from .models import GatewayTransaction, PaymentGateway
 from .serializers import GatewayTransactionSerializer
 
 logger = logging.getLogger("gateway")
@@ -33,9 +38,7 @@ class GatewayInitiateView(APIView):
             return error_response("Amount must be greater than zero.")
 
         try:
-            gateway = PaymentGateway.objects.get(
-                merchant_id=merchant_id, is_active=True
-            )
+            gateway = PaymentGateway.objects.get(merchant_id=merchant_id, is_active=True)
         except PaymentGateway.DoesNotExist:
             return error_response("Invalid or inactive merchant gateway.", 404)
 
@@ -57,13 +60,35 @@ class GatewayInitiateView(APIView):
             status="completed",
         )
 
+        merchant_name = gateway.merchant.business_name
+        record_transaction(
+            sender=request.user,
+            receiver=gateway.merchant.user,
+            merchant=gateway.merchant,
+            transaction_type="gateway",
+            amount=amount,
+            fee=fee,
+            note=f"Gateway payment to {merchant_name}"
+            + (f" (order {order_id})" if order_id else ""),
+            counterparty=merchant_name,
+            sender_message=(
+                f"You paid ৳{amount} to {merchant_name} through the payment "
+                f"gateway. Ref: {txn.txn_id}"
+            ),
+            receiver_message=(
+                f"Gateway payment of ৳{amount} received at {merchant_name}. " f"Ref: {txn.txn_id}"
+            ),
+        )
+
         logger.info(
             "Gateway: user=%s merchant=%s amount=%s fee=%s txn=%s",
-            request.user.phone, gateway.merchant.business_name, amount, fee, txn.txn_id,
+            request.user.phone,
+            gateway.merchant.business_name,
+            amount,
+            fee,
+            txn.txn_id,
         )
-        return Response(
-            GatewayTransactionSerializer(txn).data, status=status.HTTP_201_CREATED
-        )
+        return Response(GatewayTransactionSerializer(txn).data, status=status.HTTP_201_CREATED)
 
 
 class GatewayStatusView(APIView):
@@ -82,16 +107,21 @@ class GatewayHistoryView(APIView):
 
     def get(self, request):
         from common.pagination import get_page, get_page_size, paginate
-        qs = GatewayTransaction.objects.filter(
-            user=request.user
-        ).select_related("gateway__merchant").order_by("-created_at")
+
+        qs = (
+            GatewayTransaction.objects.filter(user=request.user)
+            .select_related("gateway__merchant")
+            .order_by("-created_at")
+        )
         p = paginate(qs, get_page(request), get_page_size(request))
-        return Response({
-            "count": p["count"],
-            "total_pages": p["total_pages"],
-            "page": p["page"],
-            "results": GatewayTransactionSerializer(p["queryset"], many=True).data,
-        })
+        return Response(
+            {
+                "count": p["count"],
+                "total_pages": p["total_pages"],
+                "page": p["page"],
+                "results": GatewayTransactionSerializer(p["queryset"], many=True).data,
+            }
+        )
 
 
 class GatewayWebhookView(APIView):
