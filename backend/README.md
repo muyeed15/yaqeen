@@ -2,9 +2,11 @@
 
 Islamic digital wallet API. Django REST + JWT + PostgreSQL.
 
-**Islamic features:** Mudarabah savings, Zakat and Sadaqah, Qard Hasan financing, Islamic banking, Wakalah agents, and Hawala remittance.
+**Islamic features:** Mudarabah savings, Zakat and Sadaqah, Qard Hasan financing, Islamic banking,
+Wakalah agents, and Hawala remittance.
 
-> See the [project README](../README.md) for the full quick start and production deployment with PM2.
+> See the [project README](../README.md) for the full quick start and production deployment with
+> PM2.
 
 ## Setup
 
@@ -19,11 +21,18 @@ python manage.py seed
 python manage.py runserver
 ```
 
-The `.env` file and all required values are mandatory. The server address comes from `DJANGO_PORT` and `BACKEND_HOST`; PM2 uses `BACKEND_PORT` and `BACKEND_HOST`. Startup fails immediately when configuration is missing or blank.
+The `.env` file and all required values are mandatory. The server address comes from `DJANGO_PORT`
+and `BACKEND_HOST`; PM2 uses `BACKEND_PORT` and `BACKEND_HOST`. Startup fails immediately when
+configuration is missing or blank.
+
+Install `requirements-dev.txt` to run the Black and isort formatters. Each app ships a single
+`0001_initial` migration generated from the current models.
 
 ## Production
 
-The PM2 configuration runs `gunicorn` from `backend/.venv/bin/gunicorn` directly, so the virtual environment does not need to be activated before starting PM2. See the [project README](../README.md#production) for startup commands.
+The PM2 configuration runs `gunicorn` from `backend/.venv/bin/gunicorn` directly, so the virtual
+environment does not need to be activated before starting PM2. See the
+[project README](../README.md#production) for startup commands.
 
 ## Environment Variables
 
@@ -60,8 +69,8 @@ PAGE_SIZE_MAX=50
 ```
 config/          Django project settings, root URL config, WSGI/ASGI
 accounts/        User, Wallet, Foundation, Nominee, KYC, OTP
-cards/           Card (encrypted), block/unblock
-transactions/    Transaction, Money Request
+cards/           Card (base64-encoded number), block/unblock
+transactions/    Transaction (unified ledger), Money Request
 merchants/       Merchant profiles
 notifications/   Notification + SSE streaming
 savings/         Mudarabah plans, accounts, contributions
@@ -80,26 +89,44 @@ support/         Customer support ticket system
 statements/      Monthly account statements
 ```
 
+## Transactions and Notifications
+
+Every money movement writes a `transactions.Transaction` record and creates a
+`notifications.Notification` for the affected user. This covers transfers, merchant payments, bill
+payments, recharges, agent cash in and cash out, bank add money and withdraw, remittance, tickets,
+Mudarabah contributions, Zakat and Sadaqah, Qard Hasan, gateway payments, and reward claims.
+
+- `transaction_type` is one of `send`, `payment`, `cash_in`, `cash_out`, `bill`, `recharge`, `bank`,
+  `savings`, `charity`, `loan`, `ticket`, `remittance`, or `gateway`.
+- `counterparty` stores the biller, operator, bank, agent, partner, provider, or foundation name for
+  service transactions.
+- `common/utils.record_transaction` writes the ledger entry and the notifications inside the same
+  wallet transaction.
+
+The unified ledger is the single source for wallet history, account statements, and the dashboard
+activity list.
+
 ## All API Endpoints
 
-All endpoints require `Authorization: Bearer <token>` except JWT login/refresh and the API-key-authenticated gateway webhook.
+All endpoints require `Authorization: Bearer <token>` except JWT login/refresh and the
+API-key-authenticated gateway webhook.
 
 ### Auth & Profile
 
-| Method | URL                    | Description                                   |
-| ------ | ---------------------- | --------------------------------------------- |
-| POST   | `/api/token/`          | Obtain JWT (login)                            |
-| POST   | `/api/token/refresh/`  | Refresh JWT                                   |
-| GET    | `/api/me/`             | User profile                                  |
-| GET    | `/api/wallet/`         | Wallet balance                                |
-| GET    | `/api/qr/`             | Generate QR code                              |
-| GET    | `/api/lookup/<phone>/` | Resolve user / merchant / agent name by phone |
-| GET, POST | `/api/nominees/` | List / add nominees |
-| DELETE | `/api/nominees/<pk>/` | Remove nominee |
-| GET, PUT | `/api/kyc/` | View / submit KYC |
-| GET | `/api/foundation-causes/` | List foundation causes |
-| GET | `/api/foundations/` | List verified foundations |
-| GET | `/api/foundations/<pk>/` | Foundation detail |
+| Method    | URL                       | Description                                   |
+| --------- | ------------------------- | --------------------------------------------- |
+| POST      | `/api/token/`             | Obtain JWT (login)                            |
+| POST      | `/api/token/refresh/`     | Refresh JWT                                   |
+| GET       | `/api/me/`                | User profile                                  |
+| GET       | `/api/wallet/`            | Wallet balance                                |
+| GET       | `/api/qr/`                | Generate QR code                              |
+| GET       | `/api/lookup/<phone>/`    | Resolve user / merchant / agent name by phone |
+| GET, POST | `/api/nominees/`          | List / add nominees                           |
+| DELETE    | `/api/nominees/<pk>/`     | Remove nominee                                |
+| GET, PUT  | `/api/kyc/`               | View / submit KYC                             |
+| GET       | `/api/foundation-causes/` | List foundation causes                        |
+| GET       | `/api/foundations/`       | List verified foundations                     |
+| GET       | `/api/foundations/<pk>/`  | Foundation detail                             |
 
 ### Money Transfer
 
@@ -138,12 +165,12 @@ All endpoints require `Authorization: Bearer <token>` except JWT login/refresh a
 
 ### Bill Pay
 
-| Method | URL              | Description          |
-| ------ | ---------------- | -------------------- |
+| Method | URL                       | Description          |
+| ------ | ------------------------- | -------------------- |
 | GET    | `/api/biller-categories/` | List bill categories |
-| GET    | `/api/billers/`  | List billers         |
-| POST   | `/api/pay-bill/` | Pay utility bill     |
-| GET    | `/api/bills/`    | Bill payment history |
+| GET    | `/api/billers/`           | List billers         |
+| POST   | `/api/pay-bill/`          | Pay utility bill     |
+| GET    | `/api/bills/`             | Bill payment history |
 
 ### Agents
 
@@ -218,6 +245,9 @@ All endpoints require `Authorization: Bearer <token>` except JWT login/refresh a
 | GET    | `/api/tickets/`             | Booking history  |
 | POST   | `/api/tickets/<pk>/cancel/` | Cancel booking   |
 
+Booking totals are derived from the trip price and the passenger count, so the request amount is
+recomputed on the server.
+
 ### Rewards & Offers
 
 | Method | URL                       | Description    |
@@ -229,21 +259,21 @@ All endpoints require `Authorization: Bearer <token>` except JWT login/refresh a
 
 ### Gateway
 
-| Method | URL                          | Description      |
-| ------ | ---------------------------- | ---------------- |
-| POST   | `/api/gateway/initiate/`     | Initiate payment |
-| GET    | `/api/gateway/<txn_id>/`     | Payment status   |
-| GET    | `/api/gateway-transactions/` | Gateway history  |
+| Method | URL                          | Description              |
+| ------ | ---------------------------- | ------------------------ |
+| POST   | `/api/gateway/initiate/`     | Initiate payment         |
+| GET    | `/api/gateway/<txn_id>/`     | Payment status           |
+| GET    | `/api/gateway-transactions/` | Gateway history          |
 | POST   | `/api/gateway-webhook/`      | API-key merchant webhook |
 
 ### Support
 
-| Method    | URL                                | Description           |
-| --------- | ---------------------------------- | --------------------- |
+| Method    | URL                                | Description             |
+| --------- | ---------------------------------- | ----------------------- |
 | GET       | `/api/support-categories/`         | List support categories |
-| GET, POST | `/api/support-tickets/`            | List / create tickets |
-| GET       | `/api/support-tickets/<pk>/`       | Ticket detail         |
-| POST      | `/api/support-tickets/<pk>/reply/` | Reply to ticket       |
+| GET, POST | `/api/support-tickets/`            | List / create tickets   |
+| GET       | `/api/support-tickets/<pk>/`       | Ticket detail           |
+| POST      | `/api/support-tickets/<pk>/reply/` | Reply to ticket         |
 
 ### Notifications & Statements
 
@@ -258,7 +288,9 @@ All endpoints require `Authorization: Bearer <token>` except JWT login/refresh a
 
 ## Formatting
 
-The backend is formatted with [Black](https://black.readthedocs.io/) (line length 100) and imports are ordered with [isort](https://pycqa.github.io/isort/) using the Black profile. Install the dev tools and run them:
+The backend is formatted with [Black](https://black.readthedocs.io/) (line length 100) and imports
+are ordered with [isort](https://pycqa.github.io/isort/) using the Black profile. Install the dev
+tools and run them:
 
 ```bash
 pip install -r requirements-dev.txt

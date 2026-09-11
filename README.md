@@ -1,6 +1,9 @@
 # Yaqeen
 
-Yaqeen is an Islamic digital wallet built with Django REST Framework, PostgreSQL, Next.js, and React. It supports wallet transfers, merchant payments, Mudarabah savings, Zakat and Sadaqah, Qard Hasan financing, Islamic banking, remittance, bills, recharge, tickets, rewards, and account services.
+Yaqeen is an Islamic digital wallet built with Django REST Framework, PostgreSQL, Next.js, and
+React. It supports wallet transfers, merchant payments, Mudarabah savings, Zakat and Sadaqah, Qard
+Hasan financing, Islamic banking, remittance, bills, recharge, tickets, rewards, and account
+services.
 
 ## Requirements
 
@@ -12,7 +15,8 @@ Yaqeen is an Islamic digital wallet built with Django REST Framework, PostgreSQL
 
 ## Local Setup
 
-Both services require their own `.env` file. Configuration has no code-level fallbacks; a missing file or required value stops startup.
+Both services require their own `.env` file. Configuration has no code-level fallbacks; a missing
+file or required value stops startup.
 
 ### Backend
 
@@ -29,6 +33,8 @@ python manage.py seed
 python manage.py runserver
 ```
 
+Install `backend/requirements-dev.txt` separately to run Black and isort.
+
 ### Frontend
 
 ```bash
@@ -40,13 +46,14 @@ npm run dev
 
 With the example environment values, the services are available at:
 
-| Service | Address |
-| --- | --- |
-| Backend API | `http://127.0.0.1:8003` |
+| Service      | Address                        |
+| ------------ | ------------------------------ |
+| Backend API  | `http://127.0.0.1:8003`        |
 | Django admin | `http://127.0.0.1:8003/admin/` |
-| Frontend | `http://127.0.0.1:3003` |
+| Frontend     | `http://127.0.0.1:3003`        |
 
-The frontend `DJANGO_API_URL` must point to the backend, and JWT lifetime values must match across both environment files.
+The frontend `DJANGO_API_URL` must point to the backend, and JWT lifetime values must match across
+both environment files.
 
 ## Architecture
 
@@ -60,7 +67,12 @@ Browser
 - JWTs are kept in HTTP-only cookies by Next.js and are not exposed to browser JavaScript.
 - Next.js route handlers proxy browser reads to Django; server actions handle mutations.
 - Financial mutations use database transactions and wallet row locks.
+- Every money movement writes to one transaction ledger and creates a notification, so transfers,
+  bills, recharges, agents, banking, remittance, tickets, savings, charity, loans, gateway, and
+  rewards all appear in the same history.
 - Dashboard notifications arrive through an SSE stream proxied by Next.js.
+- Server-side calls to the Django API use Node's http/https client instead of fetch to avoid a Node
+  parser crash when the backend closes a connection under backpressure.
 - Both APIs enforce authenticated, user-scoped access except the JWT endpoints.
 
 ## Validation
@@ -68,13 +80,17 @@ Browser
 ```bash
 # Backend
 cd backend
+pip install -r requirements-dev.txt
 python manage.py check
 python manage.py makemigrations --check --dry-run
 python manage.py test
+black --check .
+isort --check-only .
 
 # Frontend
 cd frontend
 npm run lint
+npm run format:check
 npm test
 npx tsc --noEmit
 npm run build
@@ -82,7 +98,9 @@ npm run build
 
 ## Production
 
-Set production values in both required `.env` files. In particular, use a strong backend `SECRET_KEY`, set `DEBUG=False`, configure allowed hosts/origins, and use HTTPS values appropriate for the deployment.
+Set production values in both required `.env` files. In particular, use a strong backend
+`SECRET_KEY`, set `DEBUG=False`, configure allowed hosts/origins, and use HTTPS values appropriate
+for the deployment.
 
 ```bash
 cd backend
