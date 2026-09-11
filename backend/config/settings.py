@@ -26,9 +26,15 @@ def required_bool(name):
     return value == "true"
 
 
+def optional_env_list(name):
+    value = os.environ.get(name, "")
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
 DEBUG = required_bool("DEBUG")
 SECRET_KEY = required_env("SECRET_KEY")
 ALLOWED_HOSTS = [host.strip() for host in required_env("ALLOWED_HOSTS").split(",")]
+CSRF_TRUSTED_ORIGINS = optional_env_list("CSRF_TRUSTED_ORIGINS")
 
 INSTALLED_APPS = [
     "common",
