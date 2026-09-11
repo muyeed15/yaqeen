@@ -16,18 +16,13 @@ import { formatAmount } from "@/utils/helpers";
 const initialState = { error: null, success: false };
 
 export default function PayPage() {
-  const [state, formAction] = useActionState(
-    merchantPayAction,
-    initialState,
-  );
+  const [state, formAction] = useActionState(merchantPayAction, initialState);
   const router = useRouter();
   const searchParams = useSearchParams();
   const formRef = useRef<HTMLFormElement>(null);
   const submitRef = useRef<HTMLButtonElement>(null);
   const [showScanner, setShowScanner] = useState(false);
-  const [merchantPhone, setMerchantPhone] = useState(
-    searchParams.get("phone") ?? "",
-  );
+  const [merchantPhone, setMerchantPhone] = useState(searchParams.get("phone") ?? "");
   const [confirmData, setConfirmData] = useState<{
     phone: string;
     amount: string;
@@ -68,12 +63,12 @@ export default function PayPage() {
           amount={state.amount!}
           to={state.merchant_name!}
           label="Payment Successful"
-          onClose={() => router.push("/dashboard")}
+          onClose={() => router.replace("/dashboard")}
         />
       )}
 
       <PageTransition>
-        <PageHeader title="Pay Merchant" subtitle="QR Payment" showBack />
+        <PageHeader title="Pay Merchant" subtitle="QR Payment" showBack backHref="/dashboard" />
 
         <div className="px-4 py-5 lg:px-8 lg:py-8 max-w-2xl mx-auto">
           {state.error && (
@@ -91,8 +86,8 @@ export default function PayPage() {
             <div className="text-navy-muted pb-4 flex gap-2 items-start">
               <Info className="h-4 w-4 mt-0.5 shrink-0 text-navy-muted" />
               <p className="text-xs leading-snug">
-                Payments are instant and <strong>cannot be reversed</strong>.
-                Verify the merchant phone number before paying.
+                Payments are instant and <strong>cannot be reversed</strong>. Verify the merchant
+                phone number before paying.
               </p>
             </div>
             <div>
@@ -131,8 +126,7 @@ export default function PayPage() {
                   placeholder="0.00"
                 />
                 <p className="text-xs text-navy-muted mt-2 flex items-center gap-1">
-                  <Info className="h-3 w-3" /> A small fee may apply for this
-                  payment.
+                  <Info className="h-3 w-3" /> A small fee may apply for this payment.
                 </p>
               </div>
               <div className="py-4">
@@ -148,7 +142,7 @@ export default function PayPage() {
             <div className="flex gap-3 pt-2">
               <button
                 type="button"
-                onClick={() => router.back()}
+                onClick={() => router.push("/dashboard")}
                 className="flex-1 py-4 text-sm font-semibold text-navy bg-sage active:scale-[0.98] rounded-xl transition-all duration-150"
               >
                 Cancel
@@ -181,9 +175,7 @@ export default function PayPage() {
                   <Store className="h-6 w-6 text-teal" />
                 </div>
                 <p className="text-navy font-bold text-base">Confirm Payment</p>
-                <p className="text-xs text-navy-muted mt-1">
-                  Are you sure you want to pay?
-                </p>
+                <p className="text-xs text-navy-muted mt-1">Are you sure you want to pay?</p>
               </div>
               <div className="bg-sage rounded-xl px-4 py-3 space-y-2">
                 <div className="flex justify-between text-sm">
@@ -194,9 +186,7 @@ export default function PayPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-navy-muted">Amount</span>
-                  <span className="text-navy font-bold">
-                    {formatAmount(confirmData.amount)}
-                  </span>
+                  <span className="text-navy font-bold">{formatAmount(confirmData.amount)}</span>
                 </div>
                 {confirmData.note && (
                   <div className="flex justify-between text-sm">

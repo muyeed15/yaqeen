@@ -1,17 +1,22 @@
-import Link from "next/link"
-import { getQardHasanProducts } from "@/utils/api"
-import { formatAmount } from "@/utils/helpers"
-import { HandCoins } from "lucide-react"
-import { PageHeader } from "@/components/ui/PageHeader"
+import Link from "next/link";
+import { getQardHasanProducts } from "@/utils/api";
+import { formatAmount } from "@/utils/helpers";
+import { HandCoins } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageHeader";
 
-export const dynamic = "force-dynamic"
+export const dynamic = "force-dynamic";
 
 export default async function LoansPage() {
-  const products = await getQardHasanProducts()
+  const products = await getQardHasanProducts();
 
   return (
     <div>
-      <PageHeader title="Qard Hasan Plans" subtitle="Interest-Free Loan" showBack />
+      <PageHeader
+        title="Qard Hasan Plans"
+        subtitle="Interest-Free Loan"
+        showBack
+        backHref="/dashboard"
+      />
 
       <div className="px-4 py-5 lg:px-8 lg:py-8 mx-auto max-w-2xl space-y-6">
         <div className="flex items-center justify-between">
@@ -41,9 +46,7 @@ export default async function LoansPage() {
                   <p className="text-navy text-xs mt-1">
                     Service fee: {formatAmount(p.service_fee)}
                   </p>
-                  <p className="text-teal text-xs mt-1 font-medium">
-                    0% Riba (Interest-free)
-                  </p>
+                  <p className="text-teal text-xs mt-1 font-medium">0% Riba (Interest-free)</p>
                 </div>
                 <div className="border-t border-sage-mid px-5 py-3">
                   <Link
@@ -59,5 +62,5 @@ export default async function LoansPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

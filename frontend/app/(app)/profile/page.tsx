@@ -8,18 +8,12 @@ import { logoutAction } from "@/app/actions";
 import { formatAmount, formatDate, getInitials } from "@/utils/helpers";
 
 export default async function ProfilePage() {
-  const [user, wallet, cardsData] = await Promise.all([
-    getMe(),
-    getWallet(),
-    getCards(1),
-  ]);
-  const activeCards = cardsData.results.filter(
-    (c) => c.status === "active",
-  ).length;
+  const [user, wallet, cardsData] = await Promise.all([getMe(), getWallet(), getCards(1)]);
+  const activeCards = cardsData.results.filter((c) => c.status === "active").length;
 
   return (
     <PageTransition>
-      <PageHeader title="Profile" subtitle="Account" showBack />
+      <PageHeader title="Profile" subtitle="Account" showBack backHref="/dashboard" />
 
       <div className="px-4 py-5 lg:px-8 lg:py-8 mx-auto max-w-2xl space-y-5">
         {/* Identity */}
@@ -106,9 +100,7 @@ export default async function ProfilePage() {
               <span className="text-xs font-semibold uppercase tracking-widest text-navy-muted w-36 shrink-0 mt-0.5">
                 {label}
               </span>
-              <span
-                className={`text-sm font-bold ${bold ? "text-navy" : "text-navy"}`}
-              >
+              <span className={`text-sm font-bold ${bold ? "text-navy" : "text-navy"}`}>
                 {value}
               </span>
             </div>
@@ -121,10 +113,7 @@ export default async function ProfilePage() {
           className="bg-white border border-sage-mid flex items-center justify-between px-4 py-4 hover:bg-sage/30 transition-colors rounded-xl"
         >
           <div className="flex items-center gap-3">
-            <CreditCard
-              className="h-5 w-5 text-navy-muted"
-              aria-hidden="true"
-            />
+            <CreditCard className="h-5 w-5 text-navy-muted" aria-hidden="true" />
             <div>
               <p className="text-sm font-semibold text-navy">My Cards</p>
               <p className="text-xs text-navy-muted">

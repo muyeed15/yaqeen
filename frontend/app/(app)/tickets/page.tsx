@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { Bus, Train, Plane, Film, Calendar, Ship, Ticket } from "lucide-react";
 import { cancelTicketAction } from "@/app/actions";
+import { useMutateOnSuccess } from "@/hooks/useMutateOnSuccess";
 import type { TicketCategory, TicketBooking } from "@/types";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -30,22 +31,16 @@ const initCancel = { ok: false, message: "" };
 
 export default function TicketsPage() {
   const router = useRouter();
-  const [cancelState, cancelAction, cancelPending] = useActionState(
-    cancelTicketAction,
-    initCancel,
-  );
-  const { data: categoryData } = useSWR<TicketCategory[]>(
-    "/api/ticket-categories",
-  );
-  const { data: bookingData } = useSWR<{ results: TicketBooking[] }>(
-    "/api/tickets?page=1",
-  );
+  const [cancelState, cancelAction, cancelPending] = useActionState(cancelTicketAction, initCancel);
+  useMutateOnSuccess(cancelState.ok);
+  const { data: categoryData } = useSWR<TicketCategory[]>("/api/ticket-categories");
+  const { data: bookingData } = useSWR<{ results: TicketBooking[] }>("/api/tickets?page=1");
   const categories = categoryData ?? [];
   const bookings = bookingData?.results ?? [];
 
   return (
     <PageTransition>
-      <PageHeader title="Tickets" subtitle="Book" showBack />
+      <PageHeader title="Tickets" subtitle="Book" showBack backHref="/dashboard" />
 
       <div className="px-4 py-5 lg:px-8 lg:py-8 mx-auto max-w-2xl space-y-8">
         {cancelState.message && (
@@ -68,9 +63,7 @@ export default function TicketsPage() {
           {categories.length === 0 ? (
             <div className="bg-white border border-sage-mid px-6 py-16 text-center rounded-2xl shadow-sm">
               <p className="text-navy font-semibold">No tickets available</p>
-              <p className="text-sm text-navy-muted mt-1">
-                Please try again later.
-              </p>
+              <p className="text-sm text-navy-muted mt-1">Please try again later.</p>
             </div>
           ) : (
             <div className="grid grid-cols-3 gap-3">
@@ -87,9 +80,7 @@ export default function TicketsPage() {
                     <div className="h-12 w-12 bg-teal rounded-2xl flex items-center justify-center">
                       <Icon className="h-6 w-6 text-white" />
                     </div>
-                    <span className="text-xs font-semibold text-navy text-center">
-                      {cat.label}
-                    </span>
+                    <span className="text-xs font-semibold text-navy text-center">{cat.label}</span>
                     <span className="text-[10px] text-navy-muted">
                       {cat.count} {cat.count === 1 ? "provider" : "providers"}
                     </span>
@@ -130,12 +121,8 @@ export default function TicketsPage() {
                         </p>
                       ) : null}
                       <div className="flex items-center gap-3 mt-2">
-                        <p className="text-sm font-semibold text-navy">
-                          ৳{b.amount}
-                        </p>
-                        <p className="text-[10px] text-navy-muted">
-                          Ref: {b.booking_reference}
-                        </p>
+                        <p className="text-sm font-semibold text-navy">৳{b.amount}</p>
+                        <p className="text-[10px] text-navy-muted">Ref: {b.booking_reference}</p>
                       </div>
                     </div>
                     <span
@@ -149,12 +136,7 @@ export default function TicketsPage() {
                   {b.status === "confirmed" && (
                     <form action={cancelAction} className="mt-3">
                       <input type="hidden" name="ticket_id" value={b.id} />
-                      <Button
-                        type="submit"
-                        loading={cancelPending}
-                        variant="secondary"
-                        size="sm"
-                      >
+                      <Button type="submit" loading={cancelPending} variant="secondary" size="sm">
                         Cancel{b.origin ? " (70% refund)" : ""}
                       </Button>
                     </form>

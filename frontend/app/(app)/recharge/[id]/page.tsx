@@ -22,18 +22,13 @@ const initialState = { ok: false, message: "" };
 export default function RechargeOperatorPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const [state, formAction, pending] = useActionState(
-    rechargeAction,
-    initialState,
-  );
+  const [state, formAction, pending] = useActionState(rechargeAction, initialState);
   const [rechargeType, setRechargeType] = useState("prepaid");
 
   const { data } = useSWR<Operator[]>("/api/operators");
   const operator = (data ?? []).find((op) => op.id === Number(id)) ?? null;
   const { data: packs } = useSWR<DataPack[]>(
-    rechargeType === "data_pack"
-      ? `/api/data-packs?operator_id=${id}`
-      : null,
+    rechargeType === "data_pack" ? `/api/data-packs?operator_id=${id}` : null,
   );
   const dataPacks = packs ?? [];
 
@@ -83,9 +78,7 @@ export default function RechargeOperatorPage() {
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-navy-muted">
                   Operator
                 </p>
-                <p className="text-sm font-semibold text-navy">
-                  {operator.name}
-                </p>
+                <p className="text-sm font-semibold text-navy">{operator.name}</p>
               </div>
             </div>
           )}
@@ -157,13 +150,7 @@ export default function RechargeOperatorPage() {
           )}
 
           {rechargeType !== "data_pack" && (
-            <Input
-              name="amount"
-              label="Amount (৳)"
-              type="number"
-              placeholder="100"
-              required
-            />
+            <Input name="amount" label="Amount (৳)" type="number" placeholder="100" required />
           )}
 
           {state.message && !state.ok && (

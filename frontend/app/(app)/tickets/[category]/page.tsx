@@ -16,8 +16,7 @@ export default function TicketProvidersPage() {
   const providers = data ?? [];
 
   const label =
-    providers[0]?.category_label ??
-    category.charAt(0).toUpperCase() + category.slice(1);
+    providers[0]?.category_label ?? category.charAt(0).toUpperCase() + category.slice(1);
 
   return (
     <PageTransition>
@@ -34,9 +33,7 @@ export default function TicketProvidersPage() {
           <p className="text-[10px] text-navy-muted font-semibold uppercase tracking-widest leading-none">
             Tickets
           </p>
-          <h1 className="text-navy font-bold text-lg leading-tight mt-0.5">
-            {label}
-          </h1>
+          <h1 className="text-navy font-bold text-lg leading-tight mt-0.5">{label}</h1>
         </div>
       </div>
 
@@ -44,9 +41,7 @@ export default function TicketProvidersPage() {
         {providers.length === 0 ? (
           <div className="bg-white border border-sage-mid px-6 py-16 text-center rounded-2xl shadow-sm">
             <p className="text-navy font-semibold">No providers available</p>
-            <p className="text-sm text-navy-muted mt-1">
-              No {label} providers at this time.
-            </p>
+            <p className="text-sm text-navy-muted mt-1">No {label} providers at this time.</p>
           </div>
         ) : (
           <div className="bg-white border border-sage-mid divide-y divide-sage-mid rounded-2xl overflow-hidden shadow-sm">

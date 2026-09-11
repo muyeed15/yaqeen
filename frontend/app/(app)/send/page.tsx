@@ -23,7 +23,11 @@ export default function SendPage() {
   const submitRef = useRef<HTMLButtonElement>(null);
   const [showScanner, setShowScanner] = useState(false);
   const [receiverPhone, setReceiverPhone] = useState(searchParams.get("phone") ?? "");
-  const [confirmData, setConfirmData] = useState<{ phone: string; amount: string; note: string } | null>(null);
+  const [confirmData, setConfirmData] = useState<{
+    phone: string;
+    amount: string;
+    note: string;
+  } | null>(null);
   const { lookup: recipient } = usePhoneLookup(receiverPhone);
 
   const showSuccess = state.success && !!state.amount && !!state.receiver_phone;
@@ -55,12 +59,12 @@ export default function SendPage() {
           amount={state.amount!}
           to={state.receiver_phone!}
           label="Transfer Successful"
-          onClose={() => router.push("/dashboard")}
+          onClose={() => router.replace("/dashboard")}
         />
       )}
 
       <PageTransition>
-        <PageHeader title="Send Money" subtitle="Transfer" showBack />
+        <PageHeader title="Send Money" subtitle="Transfer" showBack backHref="/dashboard" />
 
         <div className="px-4 py-5 lg:px-8 lg:py-8 max-w-2xl mx-auto">
           {state.error && (
@@ -69,13 +73,17 @@ export default function SendPage() {
             </div>
           )}
 
-          <form ref={formRef} action={formAction} className="bg-white border border-sage-mid rounded-2xl p-5 shadow-sm">
+          <form
+            ref={formRef}
+            action={formAction}
+            className="bg-white border border-sage-mid rounded-2xl p-5 shadow-sm"
+          >
             <button ref={submitRef} type="submit" className="hidden" />
             <div className="text-navy-muted pb-4 flex gap-2 items-start">
               <Info className="h-4 w-4 mt-0.5 shrink-0 text-navy-muted" />
               <p className="text-xs leading-snug">
-                Transfers are instant and <strong>cannot be reversed</strong>.
-                Verify the number before sending.
+                Transfers are instant and <strong>cannot be reversed</strong>. Verify the number
+                before sending.
               </p>
             </div>
             <div>
@@ -114,8 +122,7 @@ export default function SendPage() {
                   placeholder="0.00"
                 />
                 <p className="text-xs text-navy-muted mt-2 flex items-center gap-1">
-                  <Info className="h-3 w-3" /> A small fee may apply for this
-                  transfer.
+                  <Info className="h-3 w-3" /> A small fee may apply for this transfer.
                 </p>
               </div>
               <div className="py-4">
@@ -131,7 +138,7 @@ export default function SendPage() {
             <div className="flex gap-3 pt-2">
               <button
                 type="button"
-                onClick={() => router.back()}
+                onClick={() => router.push("/dashboard")}
                 className="flex-1 py-4 text-sm font-semibold text-navy bg-sage active:scale-[0.98] rounded-xl transition-all duration-150"
               >
                 Cancel
@@ -150,8 +157,14 @@ export default function SendPage() {
       </PageTransition>
 
       {confirmData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-navy/60 backdrop-blur-sm" onClick={() => setConfirmData(null)}>
-          <div className="bg-white w-full max-w-sm rounded-2xl overflow-hidden shadow-xl animate-scale-in" onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-navy/60 backdrop-blur-sm"
+          onClick={() => setConfirmData(null)}
+        >
+          <div
+            className="bg-white w-full max-w-sm rounded-2xl overflow-hidden shadow-xl animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-6 space-y-4">
               <div className="text-center">
                 <div className="mx-auto h-12 w-12 bg-teal/10 rounded-full flex items-center justify-center mb-3">
@@ -189,7 +202,10 @@ export default function SendPage() {
               </button>
               <button
                 type="button"
-                onClick={() => { setConfirmData(null); submitRef.current?.click(); }}
+                onClick={() => {
+                  setConfirmData(null);
+                  submitRef.current?.click();
+                }}
                 className="flex-1 py-4 text-sm font-semibold text-teal hover:bg-teal/5 active:opacity-70 transition-all duration-150"
               >
                 Send

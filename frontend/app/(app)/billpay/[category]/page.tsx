@@ -10,14 +10,10 @@ import { PageTransition } from "@/components/ui/PageTransition";
 export default function BillersByCategoryPage() {
   const { category } = useParams<{ category: string }>();
   const router = useRouter();
-  const { data } = useSWR<Biller[]>(
-    `/api/billers?category=${encodeURIComponent(category)}`,
-  );
+  const { data } = useSWR<Biller[]>(`/api/billers?category=${encodeURIComponent(category)}`);
   const billers = data ?? [];
 
-  const label =
-    billers[0]?.category_label ??
-    category.charAt(0).toUpperCase() + category.slice(1);
+  const label = billers[0]?.category_label ?? category.charAt(0).toUpperCase() + category.slice(1);
 
   return (
     <PageTransition>
@@ -34,9 +30,7 @@ export default function BillersByCategoryPage() {
           <p className="text-[10px] text-navy-muted font-semibold uppercase tracking-widest leading-none">
             Pay Bills
           </p>
-          <h1 className="text-navy font-bold text-lg leading-tight mt-0.5">
-            {label}
-          </h1>
+          <h1 className="text-navy font-bold text-lg leading-tight mt-0.5">{label}</h1>
         </div>
       </div>
 
@@ -44,9 +38,7 @@ export default function BillersByCategoryPage() {
         {billers.length === 0 ? (
           <div className="bg-white border border-sage-mid px-6 py-16 text-center rounded-2xl shadow-sm">
             <p className="text-navy font-semibold">No providers available</p>
-            <p className="text-sm text-navy-muted mt-1">
-              No {label} providers at this time.
-            </p>
+            <p className="text-sm text-navy-muted mt-1">No {label} providers at this time.</p>
           </div>
         ) : (
           <div className="bg-white border border-sage-mid divide-y divide-sage-mid rounded-2xl overflow-hidden shadow-sm">
@@ -60,9 +52,7 @@ export default function BillersByCategoryPage() {
                 <EntityLogo logo={b.logo} name={b.name} className="h-10 w-10" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-navy">{b.name}</p>
-                  {b.biller_code && (
-                    <p className="text-xs text-navy-muted">{b.biller_code}</p>
-                  )}
+                  {b.biller_code && <p className="text-xs text-navy-muted">{b.biller_code}</p>}
                 </div>
                 <ChevronRight className="h-5 w-5 text-navy-muted shrink-0" />
               </button>

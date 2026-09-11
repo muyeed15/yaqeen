@@ -8,11 +8,7 @@ import { BackButton } from "@/components/ui/BackButton";
 import type { Card, User, PaginatedResponse } from "@/types";
 import Image from "next/image";
 
-export default function CardDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>
-}) {
+export default function CardDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { data: cardsData, mutate } = useSWR<PaginatedResponse<Card>>("/api/cards?page=1");
   const { data: user } = useSWR<User>("/api/me");
@@ -34,7 +30,7 @@ export default function CardDetailPage({
     return (
       <div>
         <div className="bg-white px-4 h-16 flex items-center gap-3">
-          <BackButton />
+          <BackButton href="/cards" />
           <h1 className="text-navy font-bold text-lg">Card Details</h1>
         </div>
         <div className="px-4 py-5 lg:px-8 lg:py-8 mx-auto max-w-2xl">
@@ -50,7 +46,7 @@ export default function CardDetailPage({
   return (
     <div>
       <div className="bg-white px-4 h-16 flex items-center gap-3">
-        <BackButton />
+        <BackButton href="/cards" />
         <h1 className="text-navy font-bold text-lg">Card Details</h1>
       </div>
       <div className="px-4 py-5 lg:px-8 lg:py-8 mx-auto max-w-2xl space-y-6">
@@ -63,7 +59,9 @@ export default function CardDetailPage({
           </div>
           <div className="relative flex items-start justify-between">
             <div className="space-y-3">
-              <p className="text-white/50 text-[10px] font-semibold tracking-[0.15em] uppercase">Yaqeen</p>
+              <p className="text-white/50 text-[10px] font-semibold tracking-[0.15em] uppercase">
+                Yaqeen
+              </p>
               <div className="h-10 w-12 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl flex items-center justify-center">
                 <div className="grid grid-cols-3 gap-[1.5px]">
                   {[...Array(6)].map((_, i) => (
@@ -80,13 +78,17 @@ export default function CardDetailPage({
             </p>
             <div className="flex items-end justify-between">
               <div className="space-y-1">
-                <p className="text-white/40 text-[9px] font-semibold tracking-[0.15em] uppercase">Card Holder</p>
+                <p className="text-white/40 text-[9px] font-semibold tracking-[0.15em] uppercase">
+                  Card Holder
+                </p>
                 <p className="text-sm font-semibold tracking-wide">
                   {user?.full_name ?? "Cardholder"}
                 </p>
               </div>
               <div className="text-right space-y-1">
-                <p className="text-white/40 text-[9px] font-semibold tracking-[0.15em] uppercase">Expires</p>
+                <p className="text-white/40 text-[9px] font-semibold tracking-[0.15em] uppercase">
+                  Expires
+                </p>
                 <p className="text-sm font-semibold">
                   {String(card.expiry_month).padStart(2, "0")}/{card.expiry_year}
                 </p>
@@ -97,7 +99,9 @@ export default function CardDetailPage({
 
         <div className="bg-white border border-sage-mid rounded-xl overflow-hidden">
           <div className="px-4 py-2 bg-sage border-b border-sage-mid">
-            <p className="text-xs font-semibold uppercase tracking-widest text-navy-muted">Card Information</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-navy-muted">
+              Card Information
+            </p>
           </div>
           <div className="divide-y divide-sage-mid">
             <div className="flex items-center justify-between px-4 py-3">
@@ -106,39 +110,57 @@ export default function CardDetailPage({
             </div>
             <div className="flex items-center justify-between px-4 py-3">
               <span className="text-xs text-navy-muted">Status</span>
-              <span className={`text-sm font-semibold ${
-                card.status === "active"
-                  ? "text-teal"
-                  : card.status === "blocked"
-                  ? "text-red-500"
-                  : "text-navy-muted"
-              }`}>
+              <span
+                className={`text-sm font-semibold ${
+                  card.status === "active"
+                    ? "text-teal"
+                    : card.status === "blocked"
+                      ? "text-red-500"
+                      : "text-navy-muted"
+                }`}
+              >
                 {card.status.charAt(0).toUpperCase() + card.status.slice(1)}
               </span>
             </div>
             <div className="flex items-center justify-between px-4 py-3">
               <span className="text-xs text-navy-muted">Card Number</span>
-              <span className="text-sm font-semibold text-navy tabular-nums">•••• •••• •••• {card.last_four}</span>
+              <span className="text-sm font-semibold text-navy tabular-nums">
+                •••• •••• •••• {card.last_four}
+              </span>
             </div>
             <div className="flex items-center justify-between px-4 py-3">
               <span className="text-xs text-navy-muted">Type</span>
-              <span className="text-sm font-semibold text-navy">{card.card_type === "debit" ? "Debit Card" : "Prepaid Card"}</span>
+              <span className="text-sm font-semibold text-navy">
+                {card.card_type === "debit" ? "Debit Card" : "Prepaid Card"}
+              </span>
             </div>
             <div className="flex items-center justify-between px-4 py-3">
               <span className="text-xs text-navy-muted">Expiry</span>
-              <span className="text-sm font-semibold text-navy">{String(card.expiry_month).padStart(2, "0")}/{card.expiry_year}</span>
+              <span className="text-sm font-semibold text-navy">
+                {String(card.expiry_month).padStart(2, "0")}/{card.expiry_year}
+              </span>
             </div>
           </div>
         </div>
 
         {confirmFreeze && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-navy/60" onClick={() => setConfirmFreeze(false)}>
-            <div className="bg-white w-full max-w-sm rounded-xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-navy/60"
+            onClick={() => setConfirmFreeze(false)}
+          >
+            <div
+              className="bg-white w-full max-w-sm rounded-xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="p-6 text-center space-y-3">
-                <div className={`h-12 w-12 rounded-full flex items-center justify-center ${
-                  card.status === "active" ? "bg-red-100" : "bg-teal/10"
-                }`}>
-                  <Snowflake className={`h-6 w-6 ${card.status === "active" ? "text-red-500" : "text-teal"}`} />
+                <div
+                  className={`h-12 w-12 rounded-full flex items-center justify-center ${
+                    card.status === "active" ? "bg-red-100" : "bg-teal/10"
+                  }`}
+                >
+                  <Snowflake
+                    className={`h-6 w-6 ${card.status === "active" ? "text-red-500" : "text-teal"}`}
+                  />
                 </div>
                 <p className="text-navy font-bold text-base">
                   {card.status === "active" ? "Freeze Card?" : "Unfreeze Card?"}
@@ -181,9 +203,7 @@ export default function CardDetailPage({
           type="button"
           onClick={() => setConfirmFreeze(true)}
           className={`w-full py-4 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-opacity active:opacity-80 ${
-            card.status === "active"
-              ? "bg-red-500 text-white"
-              : "bg-teal text-white"
+            card.status === "active" ? "bg-red-500 text-white" : "bg-teal text-white"
           }`}
         >
           <Snowflake className="h-4 w-4" />

@@ -38,7 +38,7 @@ export default function SadaqahPage() {
   return (
     <PageTransition>
       <div className="flex items-center justify-between">
-        <PageHeader title="Give Sadaqah" subtitle="Charity" showBack />
+        <PageHeader title="Give Sadaqah" subtitle="Charity" showBack backHref="/charity" />
       </div>
 
       <div className="px-4 py-5 lg:px-8 lg:py-8 mx-auto max-w-2xl">
@@ -66,9 +66,7 @@ export default function SadaqahPage() {
                   <div className="h-12 w-12 bg-teal rounded-2xl flex items-center justify-center">
                     <Icon className="h-6 w-6 text-white" />
                   </div>
-                  <span className="text-xs font-semibold text-navy text-center">
-                    {cat.label}
-                  </span>
+                  <span className="text-xs font-semibold text-navy text-center">{cat.label}</span>
                   <span className="text-[10px] text-navy-muted">
                     {cat.count} {cat.count === 1 ? "foundation" : "foundations"}
                   </span>
@@ -87,12 +85,8 @@ export default function SadaqahPage() {
             <History className="h-6 w-6 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-navy">
-              My Donation History
-            </p>
-            <p className="text-xs text-navy-muted">
-              View your past sadaqah donations
-            </p>
+            <p className="text-sm font-semibold text-navy">My Donation History</p>
+            <p className="text-xs text-navy-muted">View your past sadaqah donations</p>
           </div>
           <ChevronRight className="h-5 w-5 text-navy-muted shrink-0" />
         </button>

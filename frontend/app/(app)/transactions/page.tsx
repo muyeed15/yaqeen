@@ -1,10 +1,5 @@
 import { getWallet, getTransactions } from "@/utils/api";
-import {
-  formatAmount,
-  formatDate,
-  getTxMeta,
-  STATUS_VARIANT,
-} from "@/utils/helpers";
+import { formatAmount, formatDate, getTxMeta, STATUS_VARIANT } from "@/utils/helpers";
 import { PageTransition } from "@/components/ui/PageTransition";
 import { Badge } from "@/components/ui/Badge";
 import { TransactionCard } from "@/components/ui/TransactionCard";
@@ -19,16 +14,13 @@ export default async function TransactionsPage({
   const { page: rawPage } = await searchParams;
   const currentPage = Math.max(1, parseInt(rawPage ?? "1") || 1);
 
-  const [wallet, txData] = await Promise.all([
-    getWallet(),
-    getTransactions(currentPage),
-  ]);
+  const [wallet, txData] = await Promise.all([getWallet(), getTransactions(currentPage)]);
   const myPhone = wallet.user_phone;
   const { results: transactions, total_pages: totalPages, count } = txData;
 
   return (
     <PageTransition>
-      <PageHeader title="Transactions" subtitle="History" showBack />
+      <PageHeader title="Transactions" subtitle="History" showBack backHref="/dashboard" />
 
       <div className="px-4 py-5 lg:px-8 lg:py-8 mx-auto max-w-2xl">
         {transactions.length === 0 ? (
@@ -45,31 +37,24 @@ export default async function TransactionsPage({
               <table className="w-full text-sm border-collapse">
                 <thead>
                   <tr className="bg-sage border-b border-sage-mid text-left">
-                    {["Type", "Counterparty", "Status", "Date", "Amount"].map(
-                      (h, i) => (
-                        <th
-                          key={h}
-                          scope="col"
-                          className={`px-4 py-3 text-[10px] font-semibold uppercase tracking-widest text-navy-muted whitespace-nowrap ${i === 4 ? "text-right" : ""}`}
-                        >
-                          {h}
-                        </th>
-                      ),
-                    )}
+                    {["Type", "Counterparty", "Status", "Date", "Amount"].map((h, i) => (
+                      <th
+                        key={h}
+                        scope="col"
+                        className={`px-4 py-3 text-[10px] font-semibold uppercase tracking-widest text-navy-muted whitespace-nowrap ${i === 4 ? "text-right" : ""}`}
+                      >
+                        {h}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-sage-mid">
                   {transactions.map((tx) => {
                     const meta = getTxMeta(tx, myPhone);
                     return (
-                      <tr
-                        key={tx.id}
-                        className="hover:bg-sage/40 transition-colors duration-100"
-                      >
+                      <tr key={tx.id} className="hover:bg-sage/40 transition-colors duration-100">
                         <td className="px-4 py-3">
-                          <span className={`font-semibold ${meta.color}`}>
-                            {meta.label}
-                          </span>
+                          <span className={`font-semibold ${meta.color}`}>{meta.label}</span>
                         </td>
                         <td className="px-4 py-3 text-navy-muted max-w-[200px]">
                           <span className="text-xs text-navy-muted/70 uppercase tracking-wide">
@@ -79,24 +64,19 @@ export default async function TransactionsPage({
                             {meta.counterparty}
                           </span>
                           {tx.note && (
-                            <span className="text-xs italic text-navy-muted/70">
-                              {tx.note}
-                            </span>
+                            <span className="text-xs italic text-navy-muted/70">{tx.note}</span>
                           )}
                         </td>
                         <td className="px-4 py-3">
                           <Badge variant={STATUS_VARIANT[tx.status]}>
-                            {tx.status.charAt(0).toUpperCase() +
-                              tx.status.slice(1)}
+                            {tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}
                           </Badge>
                         </td>
                         <td className="px-4 py-3 text-navy-muted whitespace-nowrap text-xs">
                           {formatDate(tx.created_at)}
                         </td>
                         <td className="px-4 py-3 text-right whitespace-nowrap">
-                          <span
-                            className={`font-bold tabular-nums ${meta.color}`}
-                          >
+                          <span className={`font-bold tabular-nums ${meta.color}`}>
                             {meta.minus ? "−" : "+"}
                             {formatAmount(tx.amount)}
                           </span>

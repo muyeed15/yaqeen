@@ -15,10 +15,7 @@ const initialState = { ok: false, message: "" };
 export default function ApplyLoanPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const [state, formAction, pending] = useActionState(
-    applyQardHasanAction,
-    initialState,
-  );
+  const [state, formAction, pending] = useActionState(applyQardHasanAction, initialState);
 
   const { data } = useSWR<QardHasanProduct[]>("/api/loan-products");
   const product = (data ?? []).find((p) => p.id === Number(id)) ?? null;
@@ -59,9 +56,8 @@ export default function ApplyLoanPage() {
             <div className="flex gap-2 items-start">
               <Info className="h-4 w-4 mt-0.5 shrink-0 text-navy-muted" />
               <p className="text-xs leading-snug text-navy-muted">
-                Qard Hasan is an interest-free benevolent loan. The full amount
-                is credited to your wallet immediately; you repay the principal
-                only.
+                Qard Hasan is an interest-free benevolent loan. The full amount is credited to your
+                wallet immediately; you repay the principal only.
               </p>
             </div>
 
@@ -82,9 +78,7 @@ export default function ApplyLoanPage() {
               </div>
               <div className="flex justify-between text-sm pt-1 border-t border-sage-mid">
                 <span className="text-navy-muted">Service fee</span>
-                <span className="text-navy font-bold">
-                  {product.service_fee} ৳
-                </span>
+                <span className="text-navy font-bold">{product.service_fee} ৳</span>
               </div>
             </div>
 
@@ -98,8 +92,7 @@ export default function ApplyLoanPage() {
               required
             />
             <p className="text-xs text-navy-muted">
-              Enter an amount between {product.min_amount} ৳ and{" "}
-              {product.max_amount} ৳.
+              Enter an amount between {product.min_amount} ৳ and {product.max_amount} ৳.
             </p>
 
             {state.message && !state.ok && (

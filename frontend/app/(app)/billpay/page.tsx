@@ -2,15 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import {
-  Zap,
-  Flame,
-  Droplets,
-  Wifi,
-  Tv,
-  GraduationCap,
-  Landmark,
-} from "lucide-react";
+import { Zap, Flame, Droplets, Wifi, Tv, GraduationCap, Landmark } from "lucide-react";
 import type { BillerCategory } from "@/types";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { PageTransition } from "@/components/ui/PageTransition";
@@ -32,7 +24,7 @@ export default function BillPayPage() {
 
   return (
     <PageTransition>
-      <PageHeader title="Pay Bills" subtitle="Utilities" showBack />
+      <PageHeader title="Pay Bills" subtitle="Utilities" showBack backHref="/dashboard" />
 
       <div className="px-4 py-5 lg:px-8 lg:py-8 mx-auto max-w-2xl">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-navy-muted mb-3">
@@ -59,9 +51,7 @@ export default function BillPayPage() {
                   <div className="h-12 w-12 bg-teal rounded-2xl flex items-center justify-center">
                     <Icon className="h-6 w-6 text-white" />
                   </div>
-                  <span className="text-xs font-semibold text-navy text-center">
-                    {cat.label}
-                  </span>
+                  <span className="text-xs font-semibold text-navy text-center">{cat.label}</span>
                   <span className="text-[10px] text-navy-muted">
                     {cat.count} {cat.count === 1 ? "provider" : "providers"}
                   </span>

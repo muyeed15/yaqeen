@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import useSWR from "swr";
 import { ArrowLeft } from "lucide-react";
 import { repayQardHasanAction } from "@/app/actions";
+import { useMutateOnSuccess } from "@/hooks/useMutateOnSuccess";
 import type { QardHasanApplication } from "@/types";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
@@ -23,13 +24,9 @@ const BADGE_COLORS: Record<string, string> = {
 
 export default function MyLoansPage() {
   const router = useRouter();
-  const [state, repayAction, repayPending] = useActionState(
-    repayQardHasanAction,
-    initialState,
-  );
-  const { data } = useSWR<{ results: QardHasanApplication[] }>(
-    "/api/loans?page=1",
-  );
+  const [state, repayAction, repayPending] = useActionState(repayQardHasanAction, initialState);
+  useMutateOnSuccess(state.ok);
+  const { data } = useSWR<{ results: QardHasanApplication[] }>("/api/loans?page=1");
   const loans = data?.results ?? [];
 
   return (
@@ -47,9 +44,7 @@ export default function MyLoansPage() {
           <p className="text-[10px] text-navy-muted font-semibold uppercase tracking-widest leading-none">
             Qard Hasan
           </p>
-          <h1 className="text-navy font-bold text-lg leading-tight mt-0.5">
-            My Loans
-          </h1>
+          <h1 className="text-navy font-bold text-lg leading-tight mt-0.5">My Loans</h1>
         </div>
       </div>
 
@@ -81,9 +76,7 @@ export default function MyLoansPage() {
             >
               <div className="p-5">
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold text-navy">
-                    {loan.product_name}
-                  </p>
+                  <p className="text-sm font-semibold text-navy">{loan.product_name}</p>
                   <span
                     className={`text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded ${
                       BADGE_COLORS[loan.status] ?? "bg-gray-100 text-gray-700"
@@ -92,32 +85,20 @@ export default function MyLoansPage() {
                     {loan.status}
                   </span>
                 </div>
-                <p className="text-xs text-navy-muted mt-1">
-                  Ref: {loan.loan_reference}
-                </p>
+                <p className="text-xs text-navy-muted mt-1">Ref: {loan.loan_reference}</p>
                 <div className="flex items-center gap-4 mt-2 text-xs">
                   <span className="text-navy-muted">
-                    <span className="text-navy font-semibold">
-                      ৳{loan.amount_paid}
-                    </span>{" "}
-                    paid
+                    <span className="text-navy font-semibold">৳{loan.amount_paid}</span> paid
                   </span>
                   <span className="text-navy-muted">
-                    of{" "}
-                    <span className="text-navy font-semibold">
-                      ৳{loan.amount_due}
-                    </span>
+                    of <span className="text-navy font-semibold">৳{loan.amount_due}</span>
                   </span>
                   {Number(loan.hibah_given) > 0 && (
-                    <span className="text-teal font-medium">
-                      +৳{loan.hibah_given} hibah
-                    </span>
+                    <span className="text-teal font-medium">+৳{loan.hibah_given} hibah</span>
                   )}
                 </div>
                 {loan.due_date && (
-                  <p className="text-xs text-navy-muted mt-1">
-                    Due: {loan.due_date}
-                  </p>
+                  <p className="text-xs text-navy-muted mt-1">Due: {loan.due_date}</p>
                 )}
               </div>
               {loan.status !== "repaid" && (
@@ -134,12 +115,7 @@ export default function MyLoansPage() {
                       />
                     </div>
                     <div className="w-28 shrink-0">
-                      <Input
-                        name="hibah"
-                        label="Hibah"
-                        type="number"
-                        placeholder="Optional"
-                      />
+                      <Input name="hibah" label="Hibah" type="number" placeholder="Optional" />
                     </div>
                     <Button type="submit" loading={repayPending} size="sm">
                       Repay
