@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import useSWR from "swr";
-import { Users, Search } from "lucide-react";
+import { Users, Search, ChevronDown } from "lucide-react";
 import type { Agent } from "@/types";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { PageTransition } from "@/components/ui/PageTransition";
@@ -16,23 +16,36 @@ export default function AgentsPage() {
 
   return (
     <PageTransition>
-      <PageHeader title="Nearby Agents" subtitle="Find" showBack />
+      <PageHeader title="Nearby Agents" subtitle="Find" showBack backHref="/dashboard" />
       <div className="px-4 py-5 lg:px-8 lg:py-8 mx-auto max-w-2xl space-y-5">
         <div className="bg-sage/50 border border-sage-mid rounded-2xl p-4">
           <p className="text-xs text-navy-muted leading-relaxed">
-            <strong>Cash out</strong>: go to Send Money, enter the agent&apos;s phone number or scan their QR. The agent will give you cash.
+            <strong>Cash out</strong>: go to Send Money, enter the agent&apos;s phone number or scan
+            their QR. The agent will give you cash.
           </p>
           <p className="text-xs text-navy-muted leading-relaxed mt-2">
-            <strong>Cash in</strong>: visit any agent shop. Give cash to the agent and they will deposit it into your wallet.
+            <strong>Cash in</strong>: visit any agent shop. Give cash to the agent and they will
+            deposit it into your wallet.
           </p>
         </div>
         {districts.length > 0 && (
           <div className="flex items-center gap-2 bg-white border border-sage-mid rounded-xl px-4 py-3 shadow-sm">
             <Search className="h-4 w-4 text-navy-muted shrink-0" />
-            <select value={district} onChange={(e) => setDistrict(e.target.value)} className="w-full text-sm text-navy bg-transparent focus:outline-none">
-              <option value="">All districts</option>
-              {districts.map((d) => (<option key={d} value={d}>{d}</option>))}
-            </select>
+            <div className="relative flex-1">
+              <select
+                value={district}
+                onChange={(e) => setDistrict(e.target.value)}
+                className="w-full appearance-none bg-transparent pr-6 text-sm text-navy outline-none"
+              >
+                <option value="">All districts</option>
+                {districts.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-0 top-1/2 h-4 w-4 -translate-y-1/2 text-navy-muted" />
+            </div>
           </div>
         )}
         {agentList.length === 0 ? (
@@ -51,7 +64,9 @@ export default function AgentsPage() {
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-navy">{agent.shop_name}</p>
                   <p className="text-xs text-navy-muted">{agent.address}</p>
-                  <p className="text-xs text-navy-muted">{agent.district}, {agent.thana} &middot; {agent.phone}</p>
+                  <p className="text-xs text-navy-muted">
+                    {agent.district}, {agent.thana} &middot; {agent.phone}
+                  </p>
                 </div>
               </div>
             ))}

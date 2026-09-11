@@ -1,13 +1,14 @@
-"use client"
+"use client";
 
-import { useActionState } from "react"
-import { createMudarabahAccountAction } from "@/app/actions"
-import { Button } from "@/components/ui/Button"
-import { formatDuration } from "@/utils/helpers"
-import type { MudarabahPlan } from "@/types"
+import { useActionState } from "react";
+import { createMudarabahAccountAction } from "@/app/actions";
+import { Button } from "@/components/ui/Button";
+import { Select } from "@/components/ui/Select";
+import { formatDuration } from "@/utils/helpers";
+import type { MudarabahPlan } from "@/types";
 
 export function AccountCreateForm({ plans }: { plans: MudarabahPlan[] }) {
-  const [state, action, pending] = useActionState(createMudarabahAccountAction, null)
+  const [state, action, pending] = useActionState(createMudarabahAccountAction, null);
 
   return (
     <form action={action} className="bg-white border border-sage-mid p-5 rounded-xl">
@@ -17,21 +18,17 @@ export function AccountCreateForm({ plans }: { plans: MudarabahPlan[] }) {
           {state.error}
         </div>
       )}
-      <select
-        name="plan_id"
-        required
-        className="w-full border border-sage-mid px-3 py-2 text-sm text-navy mb-3 focus:outline-none focus:border-teal rounded-lg"
-      >
+      <Select name="plan_id" label="Plan" required className="mb-3">
         <option value="">Select a plan</option>
         {plans.map((p) => (
           <option key={p.id} value={p.id}>
             {p.name} &mdash; ৳{p.monthly_amount}/mo &middot; {formatDuration(p.duration_months)}
           </option>
         ))}
-      </select>
+      </Select>
       <Button type="submit" variant="primary" size="md" loading={pending} className="w-full">
         {pending ? "Creating..." : "Open Account"}
       </Button>
     </form>
-  )
+  );
 }

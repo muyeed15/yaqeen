@@ -8,6 +8,7 @@ import { giveSadaqahAction } from "@/app/actions";
 import type { Foundation, FoundationCategory } from "@/types";
 import { EntityLogo } from "@/components/ui/EntityLogo";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { PageTransition } from "@/components/ui/PageTransition";
 
@@ -19,19 +20,11 @@ export default function GiveSadaqahFoundationPage() {
     foundationId: string;
   }>();
   const router = useRouter();
-  const [state, formAction, pending] = useActionState(
-    giveSadaqahAction,
-    initialState,
-  );
+  const [state, formAction, pending] = useActionState(giveSadaqahAction, initialState);
 
-  const { data } = useSWR<Foundation[]>(
-    `/api/foundations?cause=${encodeURIComponent(cause)}`,
-  );
-  const { data: causeData } = useSWR<FoundationCategory[]>(
-    "/api/foundation-causes",
-  );
-  const foundation =
-    (data ?? []).find((f) => f.user_id === Number(foundationId)) ?? null;
+  const { data } = useSWR<Foundation[]>(`/api/foundations?cause=${encodeURIComponent(cause)}`);
+  const { data: causeData } = useSWR<FoundationCategory[]>("/api/foundation-causes");
+  const foundation = (data ?? []).find((f) => f.user_id === Number(foundationId)) ?? null;
   const causes = causeData ?? [];
 
   return (
@@ -39,7 +32,7 @@ export default function GiveSadaqahFoundationPage() {
       <div className="bg-white px-4 h-16 flex items-center gap-3 border-b border-sage/80">
         <button
           type="button"
-          onClick={() => router.back()}
+          onClick={() => router.push(`/charity/sadaqah/${cause}`)}
           aria-label="Go back"
           className="text-navy-muted hover:text-navy active:scale-90 transition-all duration-150"
         >
@@ -80,17 +73,11 @@ export default function GiveSadaqahFoundationPage() {
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-navy-muted">
                   Foundation
                 </p>
-                <p className="text-sm font-semibold text-navy">
-                  {foundation.organization_name}
-                </p>
+                <p className="text-sm font-semibold text-navy">{foundation.organization_name}</p>
               </div>
             </div>
 
-            <input
-              type="hidden"
-              name="recipient_id"
-              value={foundation.user_id}
-            />
+            <input type="hidden" name="recipient_id" value={foundation.user_id} />
 
             <Input
               name="amount"
@@ -101,34 +88,21 @@ export default function GiveSadaqahFoundationPage() {
               required
               placeholder="e.g. 500"
             />
-            <div>
-              <label
-                htmlFor="cause"
-                className="text-[11px] font-semibold uppercase tracking-widest text-navy-muted"
-              >
-                Cause (Optional)
-              </label>
-              <select
-                id="cause"
-                name="cause"
-                defaultValue={foundation.cause ?? ""}
-                className="w-full border border-sage-mid bg-white px-3.5 py-3 text-sm text-navy rounded-xl focus:outline-none focus:border-teal focus:ring-2 focus:ring-teal/10 transition-all duration-150 mt-1.5"
-              >
-                <option value="">No specific cause</option>
-                {causes.map((c) => (
-                  <option key={c.key} value={c.key}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <Select
+              id="cause"
+              name="cause"
+              label="Cause (Optional)"
+              defaultValue={foundation.cause ?? ""}
+            >
+              <option value="">No specific cause</option>
+              {causes.map((c) => (
+                <option key={c.key} value={c.key}>
+                  {c.label}
+                </option>
+              ))}
+            </Select>
             <label className="flex items-center gap-2 text-sm text-navy">
-              <input
-                type="checkbox"
-                name="is_anonymous"
-                value="true"
-                className="accent-teal"
-              />
+              <input type="checkbox" name="is_anonymous" value="true" className="accent-teal" />
               Donate anonymously
             </label>
 

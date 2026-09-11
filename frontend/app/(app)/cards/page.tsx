@@ -8,6 +8,7 @@ import { addCardAction } from "@/app/actions";
 import type { Card, PaginatedResponse } from "@/types";
 import { Pagination } from "@/components/ui/Pagination";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { PageTransition } from "@/components/ui/PageTransition";
@@ -20,10 +21,7 @@ export default function CardsPage() {
   const cards = data?.results ?? [];
   const totalPages = data?.total_pages ?? 1;
   const [showForm, setShowForm] = useState(false);
-  const [state, formAction, pending] = useActionState(
-    addCardAction,
-    initialState,
-  );
+  const [state, formAction, pending] = useActionState(addCardAction, initialState);
   useEffect(() => {
     if (state.success) {
       mutate();
@@ -37,14 +35,12 @@ export default function CardsPage() {
 
   return (
     <PageTransition>
-      <PageHeader showBack>
+      <PageHeader showBack backHref="/dashboard">
         <div className="flex-1">
           <p className="text-[10px] text-navy-muted font-semibold uppercase tracking-widest leading-none">
             Payment Methods
           </p>
-          <h1 className="text-navy font-bold text-lg leading-tight mt-0.5">
-            My Cards
-          </h1>
+          <h1 className="text-navy font-bold text-lg leading-tight mt-0.5">My Cards</h1>
         </div>
         <button
           type="button"
@@ -90,17 +86,10 @@ export default function CardsPage() {
                 />
               </div>
               <div className="py-4">
-                <label className="block text-xs font-semibold uppercase tracking-widest text-navy-muted mb-2">
-                  Card Type
-                </label>
-                <select
-                  name="card_type"
-                  required
-                  className="w-full border border-sage-mid px-3 py-2 text-sm text-navy bg-white focus:outline-none focus:ring-1 focus:ring-teal rounded-lg"
-                >
+                <Select name="card_type" label="Card Type" required>
                   <option value="debit">Debit Card</option>
                   <option value="prepaid">Prepaid Card</option>
-                </select>
+                </Select>
               </div>
               <div className="py-4 grid grid-cols-2 gap-4">
                 <Input
@@ -138,14 +127,9 @@ export default function CardsPage() {
 
         {cards.length === 0 && !showForm ? (
           <div className="bg-white border border-sage-mid px-6 py-16 text-center rounded-xl">
-            <CreditCard
-              className="h-10 w-10 text-navy-muted mx-auto mb-3"
-              strokeWidth={1.5}
-            />
+            <CreditCard className="h-10 w-10 text-navy-muted mx-auto mb-3" strokeWidth={1.5} />
             <p className="text-navy font-semibold">No cards linked</p>
-            <p className="text-sm text-navy-muted mt-1">
-              Add a card to get started.
-            </p>
+            <p className="text-sm text-navy-muted mt-1">Add a card to get started.</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -163,18 +147,19 @@ export default function CardsPage() {
                     •••• •••• •••• {card.last_four}
                   </p>
                   <p className="text-white/60 text-xs mt-2">
-                    Expires {String(card.expiry_month).padStart(2, "0")}/
-                    {card.expiry_year}
+                    Expires {String(card.expiry_month).padStart(2, "0")}/{card.expiry_year}
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-3">
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${
-                    card.status === "active"
-                      ? "bg-white/20 text-white"
-                      : card.status === "blocked"
-                      ? "bg-red-400/30 text-red-200"
-                      : "bg-white/10 text-white/60"
-                  }`}>
+                  <span
+                    className={`text-xs font-semibold px-2 py-0.5 rounded-md ${
+                      card.status === "active"
+                        ? "bg-white/20 text-white"
+                        : card.status === "blocked"
+                          ? "bg-red-400/30 text-red-200"
+                          : "bg-white/10 text-white/60"
+                    }`}
+                  >
                     {card.status.charAt(0).toUpperCase() + card.status.slice(1)}
                   </span>
                   <ArrowRight className="h-4 w-4 text-white/40" />
