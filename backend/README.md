@@ -37,21 +37,22 @@ environment does not need to be activated before starting PM2. See the
 ## Environment Variables
 
 ```
+# Core
 SECRET_KEY=django-insecure-changeme
 DEBUG=True
-
-# BACKEND host, without a scheme.
 ALLOWED_HOSTS=backend.example.com,localhost,127.0.0.1
-# FRONTEND origin, with a scheme.
+
+# Origins (used when DEBUG=False)
 CORS_ALLOWED_ORIGINS=https://frontend.example.com
-# BACKEND origin, with a scheme. Used for forms and the Django admin.
 CSRF_TRUSTED_ORIGINS=https://backend.example.com
 
+# HTTPS hardening (used when DEBUG=False)
 SECURE_SSL_REDIRECT=True
 SECURE_HSTS_SECONDS=31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS=False
 SECURE_HSTS_PRELOAD=False
 
+# Database
 DB_NAME=yaqeen_db
 DB_USER=postgres
 DB_PASSWORD=your-password
@@ -59,20 +60,28 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_CONN_MAX_AGE=60
 
+# JWT
 ACCESS_TOKEN_MINUTES=1440
 REFRESH_TOKEN_MINUTES=43200
+
+# Server bind address (dev runserver and PM2/Gunicorn)
 DJANGO_PORT=8003
 BACKEND_PORT=8003
 BACKEND_HOST=127.0.0.1
 
+# Business rules
 TRANSFER_FEE_PERCENT=1.5
 PAGE_SIZE=10
 PAGE_SIZE_MAX=50
+
+# Optional: absolute path to the Gunicorn binary used by PM2
+# GUNICORN_PATH=/absolute/path/to/gunicorn
 ```
 
 `ALLOWED_HOSTS` takes the backend host, `CORS_ALLOWED_ORIGINS` takes the frontend origin, and
 `CSRF_TRUSTED_ORIGINS` takes the backend origin. Host entries have no scheme; origins keep
-`https://`.
+`https://`. All values are required when `DEBUG=False`; `CSRF_TRUSTED_ORIGINS` and `GUNICORN_PATH`
+are optional.
 
 ## Project Structure
 
